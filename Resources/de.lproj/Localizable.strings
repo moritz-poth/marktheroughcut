@@ -1,0 +1,57 @@
+/* Fenster */
+"Drop a video here" = "Video hierher ziehen";
+"Open Video…" = "Video öffnen…";
+"MOV and MP4 – everything QuickTime Player plays." = "MOV und MP4 – alles, was der QuickTime Player abspielt.";
+"Close" = "Schließen";
+"Overview" = "Übersicht";
+"Timeline" = "Timeline";
+
+/* Tasten */
+"Space" = "Leertaste";
+"Play" = "Abspielen";
+"Shuttle" = "Shuttle";
+"Frame" = "Bild";
+"Second" = "Sekunde";
+"Zoom" = "Zoom";
+"Marker" = "Marker";
+"Jump" = "Springen";
+
+/* Marker */
+"MARKERS" = "MARKER";
+"Markers" = "Marker";
+"Press M to set a marker at the playhead." = "Drücke M, um an der Abspielposition einen Marker zu setzen.";
+"Comment" = "Kommentar";
+"Colour" = "Farbe";
+"Delete marker" = "Marker löschen";
+"Red" = "Rot";
+"Green" = "Grün";
+"Blue" = "Blau";
+"Cyan" = "Cyan";
+"Magenta" = "Magenta";
+"Yellow" = "Gelb";
+"Black" = "Schwarz";
+"White" = "Weiß";
+
+/* Name */
+"Your name" = "Dein Name";
+"It appears with every marker in Avid, so the editor knows who wrote it." = "Er steht in Avid bei jedem Marker, damit der Schnitt weiß, von wem er ist.";
+"Name" = "Name";
+"OK" = "OK";
+"Change Name…" = "Name ändern…";
+
+/* Import / Export */
+"Import Avid Markers…" = "Avid-Marker importieren…";
+"Export Avid Markers…" = "Avid-Marker exportieren…";
+"Choose a marker list exported from Avid (Markers window → Export Markers)." = "Wähle eine aus Avid exportierte Markerliste (Marker-Fenster → Export Markers).";
+"In Avid: Markers window → Import Markers." = "In Avid: Marker-Fenster → Import Markers.";
+"%lld markers imported." = "%lld Marker importiert.";
+"%lld lie outside this video’s timecode and were left out." = "%lld liegen außerhalb des Timecodes dieses Videos und wurden ausgelassen.";
+"%lld lines could not be read." = "%lld Zeilen konnten nicht gelesen werden.";
+
+/* Meldungen */
+"This file cannot be played. MarkTheRoughcut plays what QuickTime Player plays (e.g. MOV and MP4 with H.264, HEVC or ProRes)." = "Diese Datei lässt sich nicht abspielen. MarkTheRoughcut spielt, was der QuickTime Player spielt (z. B. MOV und MP4 mit H.264, HEVC oder ProRes).";
+"This file has no timecode. Markers start at 00:00:00:00 – they will only line up in Avid if the clip there starts at 00:00:00:00 too." = "Diese Datei hat keinen Timecode. Die Marker beginnen bei 00:00:00:00 – in Avid passen sie nur, wenn der Clip dort ebenfalls bei 00:00:00:00 beginnt.";
+"The video could not be opened: %@" = "Das Video konnte nicht geöffnet werden: %@";
+"The marker list could not be read: %@" = "Die Markerliste konnte nicht gelesen werden: %@";
+"The marker list could not be saved: %@" = "Die Markerliste konnte nicht gespeichert werden: %@";
+"The markers could not be saved: %@" = "Die Marker konnten nicht gespeichert werden: %@";

@@ -1,0 +1,6 @@
+.build/
+dist/
+.DS_Store
+.omc/
+# private sample from a real project – never commit
+Marker.txt
