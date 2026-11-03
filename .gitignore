@@ -4,3 +4,5 @@ dist/
 .omc/
 # private sample from a real project – never commit
 Marker.txt
+# the user's Avid screenshots (private project names)
+SCR-*.png

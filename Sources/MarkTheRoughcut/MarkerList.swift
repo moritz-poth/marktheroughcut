@@ -106,7 +106,9 @@ struct MarkerRow: View {
                 .animation(.easeOut(duration: 0.12), value: focused)
         }
         .padding(.horizontal, 14).padding(.vertical, 10)
-        .background(selected ? theme.text.opacity(0.07) : Color.clear)
+        .background(selected ? theme.selection : Color.clear)
+        // selected: a thin bar in the marker's colour instead of a darker grey
+        .overlay(alignment: .leading) { if selected { Rectangle().fill(marker.color.color).frame(width: 3) } }
         .contentShape(Rectangle())
         .onTapGesture { model.jump(to: marker) }
         .onChange(of: focused) { f in if f { model.jump(to: marker) } }

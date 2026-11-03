@@ -16,11 +16,14 @@ struct Theme {
     var line: Color { c(0x3a3f44, 0xc4c8cc) }
     var primary: Color { c(0xe6e7e8, 0x2e3236) }
     var onPrimary: Color { c(0x1f2225, 0xf5f5f3) }
-    var playhead: Color { c(0xf85149, 0xc62828) }
+    var playhead: Color { c(0x226e8e, 0x226e8e) } // Avid-like blue (the user's reference)
     var warning: Color { c(0xf0883e, 0xe16f24) }
-    /// Comment being edited: slightly lighter surface, slightly darker outline – visible but quiet.
-    var field: Color { c(0x272a2d, 0xfbfbf9) }
-    var fieldLine: Color { c(0x0e1011, 0xb4b8bc) }
+    /// Selected marker row; the comment box (lighter surface, darker outline) stays clearly lighter than it.
+    var selection: Color { c(0x24282c, 0xdfe2e5) }
+    var field: Color { c(0x30353a, 0xffffff) }
+    var fieldLine: Color { c(0x121416, 0xaab0b6) }
+    /// Marker lane in the timeline – a grey band like Avid's marker track.
+    var lane: Color { c(0x2c3034, 0xd7dadd) }
     var wave: Color { c(0x5a6066, 0xa4a9ae) }
 }
 
@@ -44,6 +47,9 @@ extension MarkerColor {
         case .white: return Color(white: 0.95)
         }
     }
+
+    /// Light marker colours need a dark outline when selected.
+    var isLight: Bool { [.green, .cyan, .yellow, .white].contains(self) }
 
     var label: LocalizedStringKey {
         switch self {
@@ -114,5 +120,33 @@ struct Switch: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(on ? .isSelected : [])
+    }
+}
+
+/// Plain slider: a line with a knob to drag (volume).
+struct LineSlider: View {
+    @Binding var value: Double // 0…1
+    let theme: Theme
+    var body: some View {
+        GeometryReader { geo in
+            let w = geo.size.width, knob: CGFloat = 12
+            let x = knob / 2 + CGFloat(value) * (w - knob)
+            ZStack(alignment: .leading) {
+                Capsule().fill(theme.line).frame(height: 2)
+                Capsule().fill(theme.muted).frame(width: x, height: 2)
+                Circle().fill(theme.primary).frame(width: knob, height: knob)
+                    .overlay(Circle().stroke(theme.line, lineWidth: 1))
+                    .offset(x: x - knob / 2)
+            }
+            .frame(maxHeight: .infinity)
+            .contentShape(Rectangle())
+            .gesture(DragGesture(minimumDistance: 0).onChanged { v in
+                value = Double(min(max(0, (v.location.x - knob / 2) / (w - knob)), 1))
+            })
+        }
+        .frame(height: 16)
+        .accessibilityElement()
+        .accessibilityValue(Text("\(Int(value * 100)) %"))
+        .accessibilityAdjustableAction { d in value = min(max(0, value + (d == .increment ? 0.1 : -0.1)), 1) }
     }
 }

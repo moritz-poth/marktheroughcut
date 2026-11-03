@@ -39,38 +39,19 @@ final class AppSettings: ObservableObject {
     }
 }
 
-/// Settings window (⌘,): appearance, language and About.
+/// Settings window (⌘,): appearance and language. About has its own window.
 struct SettingsView: View {
     @ObservedObject var settings = AppSettings.shared
-    @State private var tab = 0
+    @ObservedObject private var updater = Updater.shared
 
     var body: some View {
         let t = settings.theme
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 18) {
-                tabButton("General", 0, t)
-                tabButton("About", 1, t)
-                Spacer()
-            }
-            .padding(.horizontal, 24).padding(.top, 18).padding(.bottom, 12)
-            Rectangle().fill(t.line).frame(height: 1)
-            Group {
-                if tab == 0 { general(t) } else { about(t) }
-            }
+        general(t)
             .padding(24)
-        }
-        .frame(width: 460)
-        .fixedSize(horizontal: false, vertical: true)
-        .background(t.background)
-        .environment(\.colorScheme, settings.dark ? .dark : .light)
-        .onReceive(NotificationCenter.default.publisher(for: .showAbout)) { _ in tab = 1 }
-    }
-
-    private func tabButton(_ title: LocalizedStringKey, _ index: Int, _ t: Theme) -> some View {
-        Button { tab = index } label: {
-            Text(title).font(.mono(12, semibold: tab == index)).foregroundColor(tab == index ? t.text : t.faint)
-        }
-        .buttonStyle(.plain)
+            .frame(width: 460)
+            .fixedSize(horizontal: false, vertical: true)
+            .background(t.background)
+            .environment(\.colorScheme, settings.dark ? .dark : .light)
     }
 
     private func general(_ t: Theme) -> some View {
@@ -94,7 +75,44 @@ struct SettingsView: View {
             }
             Text("Changing the language restarts MarkTheRoughcut. Your markers are saved.")
                 .font(.mono(11)).foregroundColor(t.faint).fixedSize(horizontal: false, vertical: true)
+            Rectangle().fill(t.line).frame(height: 1)
+            // updates, same as in Mountpoint
+            HStack(spacing: 10) {
+                Text("Version \(Updater.current)").font(.mono()).foregroundColor(t.text)
+                Spacer()
+                if updater.state == .checking { ProgressView().controlSize(.small) }
+                Button("Check for updates") { updater.check(manual: true) }
+                    .buttonStyle(FerryButtonStyle(theme: t))
+                    .disabled(updater.state == .checking || updater.state == .installing)
+            }
+            switch updater.state {
+            case .upToDate:
+                Text("MarkTheRoughcut is up to date.").font(.mono(11)).foregroundColor(t.faint)
+            case .failed(let message) where updater.available == nil:
+                Text(message).font(.mono(11)).foregroundColor(t.warning).fixedSize(horizontal: false, vertical: true)
+            default:
+                if let r = updater.available {
+                    Text("MarkTheRoughcut \(UpdateBanner.version(r)) is available.").font(.mono(11)).foregroundColor(t.text)
+                }
+            }
+            Text("MarkTheRoughcut checks GitHub for new versions on its own and shows a notice.")
+                .font(.mono(11)).foregroundColor(t.faint).fixedSize(horizontal: false, vertical: true)
         }
+    }
+}
+
+/// About window (App menu → About MarkTheRoughcut): version, license, third-party notices.
+struct AboutView: View {
+    @ObservedObject var settings = AppSettings.shared
+
+    var body: some View {
+        let t = settings.theme
+        about(t)
+            .padding(24)
+            .frame(width: 440)
+            .fixedSize(horizontal: false, vertical: true)
+            .background(t.background)
+            .environment(\.colorScheme, settings.dark ? .dark : .light)
     }
 
     private func about(_ t: Theme) -> some View {
@@ -126,8 +144,4 @@ struct SettingsView: View {
                 .font(.mono(11)).foregroundColor(t.faint).fixedSize(horizontal: false, vertical: true)
         }
     }
-}
-
-extension Notification.Name {
-    static let showAbout = Notification.Name("showAbout")
 }

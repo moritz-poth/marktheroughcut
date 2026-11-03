@@ -23,6 +23,7 @@ MarkTheRoughcut is a simple player for reviewing a cut. You watch the video, set
 - **⌥← ⌥→** – previous / next marker
 - **↑ ↓** – zoom the timeline
 - **M** – set a marker at the playhead
+- **I / O** – mark in / out for a marker with a duration; **G** clears both
 - **⌫** – delete the selected marker
 - **Esc** or **Enter** – finish writing a comment (a click anywhere else does the same)
 
@@ -31,6 +32,7 @@ MarkTheRoughcut is a simple player for reviewing a cut. You watch the video, set
 - Press **M** to set a marker at the playhead. A comment field opens right away – just start typing.
 - The first time, MarkTheRoughcut asks for your name. It appears with every marker in Avid, so the editor knows who wrote it. Your name is shown above the marker list; click the pencil to change it.
 - Click a marker in the list or in the timeline to jump to it. Click its comment to edit it.
+- **Marker with a duration:** press **I** at the start and **O** at the end, then **M**. The marker spans from in to out: a marker at the start and the end, joined by a thin line. **G** clears in and out.
 - Click the coloured dot to choose a colour. New markers get the colour you chose last.
 - Markers are saved automatically next to the video (as “<video name>.markers.json”). Open the video again later and they are all back.
 
@@ -48,6 +50,7 @@ MarkTheRoughcut is a simple player for reviewing a cut. You watch the video, set
 ## Settings
 
 - **MarkTheRoughcut → Settings…** (⌘,): light or dark appearance and the language (English, Deutsch, Français, Español). Changing the language restarts the app; your markers are saved.
+- **Updates:** MarkTheRoughcut checks GitHub for new versions on its own and shows a notice at the top of the window – **Install update** replaces the app and restarts it. In Settings you can also click **Check for updates**.
 
 ## Problems
 

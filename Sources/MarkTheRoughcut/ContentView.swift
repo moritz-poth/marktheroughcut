@@ -49,6 +49,7 @@ struct FlowLayout: Layout {
 struct ContentView: View {
     @ObservedObject var model: PlayerModel
     @ObservedObject private var settings = AppSettings.shared
+    @AppStorage("volume") private var volume = 1.0
     @State private var askName = false
     @State private var nameDraft = ""
     private var t: Theme { settings.theme }
@@ -57,13 +58,15 @@ struct ContentView: View {
         HStack(spacing: 0) {
             VStack(spacing: 0) {
                 topBar
+                UpdateBanner(theme: t)
                 if model.info == nil {
                     dropHint
                 } else {
                     VideoView(player: model.player).background(Color.black)
-                    VStack(spacing: 8) {
+                    // same gap between the timelines as between video and overview (the 12 pt padding)
+                    VStack(spacing: 12) {
                         OverviewBar(model: model, theme: t).frame(height: 40)
-                        DetailTimeline(model: model, theme: t).frame(height: 84)
+                        DetailTimeline(model: model, theme: t).frame(height: 100)
                         keyHelp
                     }
                     .padding(12)
@@ -77,6 +80,8 @@ struct ContentView: View {
         }
         .background(t.background)
         .environment(\.colorScheme, settings.dark ? .dark : .light)
+        .onAppear { model.player.volume = Float(volume) }
+        .onChange(of: volume) { v in model.player.volume = Float(v) }
         .onDrop(of: [.fileURL], isTargeted: nil) { providers in
             _ = providers.first?.loadObject(ofClass: URL.self) { url, _ in
                 if let url { Task { @MainActor in await model.open(url) } }
@@ -102,6 +107,15 @@ struct ContentView: View {
                         .buttonStyle(.plain).accessibilityLabel(Text("Close"))
                 }
             }
+            if model.info != nil {
+                HStack(spacing: 8) {
+                    Image(systemName: volume == 0 ? "speaker.slash" : "speaker.wave.2").font(.system(size: 11)).foregroundColor(t.faint)
+                        .frame(width: 16)
+                    LineSlider(value: $volume, theme: t).frame(width: 90)
+                }
+                .help(Text("Volume"))
+                .accessibilityLabel(Text("Volume"))
+            }
             Text(model.tc).font(.mono(22, semibold: true)).foregroundColor(t.text).monospacedDigit()
         }
         .padding(.horizontal, 16).frame(height: 48)
@@ -122,7 +136,7 @@ struct ContentView: View {
         // wraps instead of widening the window (German labels are longer)
         FlowLayout(spacing: 14, lineSpacing: 4) {
             ForEach([("Space", "Play"), ("J K L", "Shuttle"), ("← →", "Frame"), ("⇧← →", "Second"), ("↑ ↓", "Zoom"),
-                     ("M", "Marker"), ("⌥← →", "Jump")], id: \.0) { key, what in
+                     ("M", "Marker"), ("I O", "In / Out"), ("⌥← →", "Jump")], id: \.0) { key, what in
                 HStack(spacing: 5) {
                     Text(LocalizedStringKey(key)).font(.mono(10, semibold: true)).foregroundColor(t.muted)
                     Text(LocalizedStringKey(what)).font(.mono(10)).foregroundColor(t.faint)

@@ -23,6 +23,7 @@ MarkTheRoughcut es un reproductor sencillo para revisar un montaje. Ves el víde
 - **⌥← ⌥→** – marcador anterior / siguiente
 - **↑ ↓** – zoom de la línea de tiempo
 - **M** – poner un marcador en el cabezal
+- **I / O** – entrada / salida para un marcador con duración; **G** borra ambas
 - **⌫** – eliminar el marcador seleccionado
 - **Esc** o **Intro** – terminar un comentario (un clic en cualquier otro sitio hace lo mismo)
 
@@ -31,6 +32,7 @@ MarkTheRoughcut es un reproductor sencillo para revisar un montaje. Ves el víde
 - Pulsa **M** para poner un marcador en el cabezal. El campo de comentario se abre al momento – solo tienes que escribir.
 - La primera vez, MarkTheRoughcut te pide tu nombre. Aparece con cada marcador en Avid, para que el montador sepa quién lo escribió. Tu nombre se muestra encima de la lista; haz clic en el lápiz para cambiarlo.
 - Haz clic en un marcador de la lista o de la línea de tiempo para saltar a él. Haz clic en su comentario para editarlo.
+- **Marcador con duración:** pulsa **I** al principio y **O** al final, después **M**. El marcador va de la entrada a la salida: un marcador al principio y otro al final, unidos por una línea fina. **G** borra la entrada y la salida.
 - Haz clic en el punto de color para elegir un color. Los marcadores nuevos llevan el último color elegido.
 - Los marcadores se guardan automáticamente junto al vídeo (como «<nombre del vídeo>.markers.json»). Si vuelves a abrir el vídeo más tarde, estarán todos.
 
@@ -48,6 +50,7 @@ MarkTheRoughcut es un reproductor sencillo para revisar un montaje. Ves el víde
 ## Ajustes
 
 - **MarkTheRoughcut → Ajustes…** (⌘,): aspecto claro u oscuro y el idioma (English, Deutsch, Français, Español). Al cambiar el idioma, la app se reinicia; tus marcadores están guardados.
+- **Actualizaciones:** MarkTheRoughcut busca por sí mismo nuevas versiones en GitHub y muestra un aviso arriba en la ventana – **Instalar actualización** reemplaza la app y la reinicia. En Ajustes también puedes hacer clic en **Buscar actualizaciones**.
 
 ## Problemas
 

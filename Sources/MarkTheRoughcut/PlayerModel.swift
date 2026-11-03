@@ -15,6 +15,9 @@ final class PlayerModel: ObservableObject {
     @Published private(set) var rate: Float = 0
     @Published var markers: [Marker] = [] { didSet { if !loading { save() } } }
     @Published var selection: Marker.ID?
+    /// In / out (video frame indices) like in Avid: with both set, M makes a spanned marker from in to out.
+    @Published var markIn: Int?
+    @Published var markOut: Int?
     /// Detail timeline zoom: visible seconds = duration / zoom.
     @Published var zoom: Double = 8
     @Published var notice: String?
@@ -78,6 +81,9 @@ final class PlayerModel: ObservableObject {
 
     private func makeThumbnails(_ asset: AVURLAsset, _ info: VideoInfo) {
         thumbnails = []
+        zoom = 1 // a new video always starts with the whole timeline
+        markIn = nil
+        markOut = nil
         let gen = AVAssetImageGenerator(asset: asset)
         gen.appliesPreferredTrackTransform = true
         gen.maximumSize = CGSize(width: 160, height: 90)
@@ -143,17 +149,39 @@ final class PlayerModel: ObservableObject {
     func addMarker() {
         guard let info else { return }
         player.pause()
+        if let a = markIn, let b = markOut, b > a {
+            let m = Marker(frame: info.tcFrame(ofIndex: a), duration: b - a + 1, user: userName,
+                           color: MarkerColor(rawValue: defaultColor) ?? .red, comment: "")
+            markIn = nil
+            markOut = nil
+            insert(m)
+            return
+        }
         let frame = info.tcFrame(ofIndex: index)
         if let existing = markers.first(where: { $0.frame == frame }) {
             selection = existing.id
             editing = existing.id
             return
         }
-        let m = Marker(frame: frame, user: userName, color: MarkerColor(rawValue: defaultColor) ?? .red, comment: "")
+        insert(Marker(frame: frame, user: userName, color: MarkerColor(rawValue: defaultColor) ?? .red, comment: ""))
+    }
+
+    private func insert(_ m: Marker) {
         markers.append(m)
         markers.sort { $0.frame < $1.frame }
         selection = m.id
         editing = m.id
+    }
+
+    /// I / O set the span for the next marker; an out before the in (or the other way round) drops the other mark.
+    func setMark(in isIn: Bool) {
+        if isIn {
+            markIn = index
+            if let o = markOut, o <= index { markOut = nil }
+        } else {
+            markOut = index
+            if let i = markIn, i >= index { markIn = nil }
+        }
     }
 
     /// Binding to one marker found by id on every access (a position-based binding would write into the

@@ -12,7 +12,8 @@ A simple Mac player for directors: watch a rough cut, set markers with comments 
 - **Timecode from the file** – markers land exactly where they belong in Avid.
 - **Overview bar** with thumbnails, plus a **zoomable timeline** around the playhead (↑/↓) with Avid-style markers and the sound as a waveform.
 - Markers with colour and comment; saved automatically next to the video. Your name is shown above the marker list.
-- Light or dark appearance, built-in manual in four languages.
+- Light or dark appearance, built-in manual in four languages, volume control.
+- **Updates itself:** checks GitHub for new versions and installs them with one click (Settings → Check for updates).
 - **Export** an Avid marker list (Markers window → Import Markers). Characters Avid stumbles over (umlauts, “/”, quotes, line breaks) are replaced, so every marker arrives complete.
 - **Import** a marker list exported from Avid – e.g. the editor's notes for the director.
 
@@ -27,6 +28,7 @@ A simple Mac player for directors: watch a rough cut, set markers with comments 
 | ⌥← ⌥→ | Previous / next marker |
 | ↑ ↓ | Zoom the timeline around the playhead |
 | M | Set a marker at the playhead |
+| I O | Mark in / out – M then sets a marker with a duration; G clears them |
 | ⌫ | Delete the selected marker |
 | Esc / Enter | Leave the comment field (or click anywhere else) |
 
@@ -34,7 +36,7 @@ The first marker asks for your name – it appears with every marker in Avid.
 
 ## Install
 
-Requires macOS 13 or later, Apple Silicon or Intel. Download `MarkTheRoughcut-<version>.zip` from [Releases](../../releases), unzip, move the app to Applications. It is not signed with a paid Apple certificate: on first launch, open **System Settings → Privacy & Security** and click **Open Anyway** (once).
+Requires macOS 13 or later, Apple Silicon or Intel. Download `MarkTheRoughcut-<version>.zip` from [Releases](../../releases), unzip, move the app to Applications (so it can update itself). It is not signed with a paid Apple certificate: on first launch, open **System Settings → Privacy & Security** and click **Open Anyway** (once).
 
 ## Build
 

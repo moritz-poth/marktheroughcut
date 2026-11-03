@@ -21,13 +21,17 @@ struct OverviewBar: View {
                 }
                 .opacity(0.55)
                 Canvas { ctx, size in
+                    // frame first, so the range outline below is drawn on top of it and never looks thinner at the edges
+                    ctx.stroke(Path(CGRect(origin: .zero, size: size).insetBy(dx: 0.5, dy: 0.5)), with: .color(theme.line), lineWidth: 1)
                     guard let info = model.info else { return }
                     let n = CGFloat(max(1, info.frameCount - 1))
                     let x = { (i: Int) in CGFloat(i) / n * size.width }
-                    // range of the detail timeline
+                    // range of the detail timeline: kept inside the bar, so its outline is always the full 2 px
                     let (a, b) = detailRange(model)
-                    ctx.stroke(Path(CGRect(x: x(a), y: 0.5, width: max(2, x(b) - x(a)), height: size.height - 1)), with: .color(theme.text.opacity(0.7)), lineWidth: 1)
-                    ctx.fill(Path(CGRect(x: x(model.index) - 1, y: 0, width: 2, height: size.height)), with: .color(theme.playhead))
+                    let l = min(max(0, x(a).rounded()), size.width - 6), r = max(min(size.width, x(b).rounded()), l + 6)
+                    ctx.stroke(Path(CGRect(x: l, y: 0, width: r - l, height: size.height).insetBy(dx: 1, dy: 1)),
+                               with: .color(theme.text.opacity(0.85)), lineWidth: 2)
+                    ctx.fill(Path(CGRect(x: x(model.index) - 1.5, y: 0, width: 3, height: size.height)), with: .color(theme.playhead))
                 }
             }
             .frame(width: w, height: geo.size.height)
@@ -38,7 +42,6 @@ struct OverviewBar: View {
                 model.seek(toFraction: min(max(0, v.location.x / w), 1))
             })
         }
-        .overlay(Rectangle().stroke(theme.line, lineWidth: 1))
         .accessibilityLabel(Text("Overview"))
     }
 }
@@ -82,10 +85,12 @@ struct DetailTimeline: View {
                     }
                     t += step
                 }
-                ctx.fill(Path(CGRect(x: 0, y: 22, width: size.width, height: 1)), with: .color(theme.line))
+                ctx.fill(Path(CGRect(x: 0, y: Lane.top - 1, width: size.width, height: 1)), with: .color(theme.line))
+                ctx.fill(Path(CGRect(x: 0, y: Lane.top, width: size.width, height: Lane.height)), with: .color(theme.lane))
+                ctx.fill(Path(CGRect(x: 0, y: Lane.top + Lane.height, width: size.width, height: 1)), with: .color(theme.line))
                 // waveform: quiet, mirrored around the middle of the lower lane
                 if let wave = model.waveform {
-                    let top: CGFloat = 46, mid = top + (size.height - top) / 2, half = (size.height - top) / 2 - 3
+                    let top = Lane.top + Lane.height + 1, mid = top + (size.height - top) / 2, half = (size.height - top) / 2 - 3
                     let secPerPx = Double(span) / Double(size.width) / info.fpsReal
                     let startSec = Double(a) / info.fpsReal
                     var path = Path()
@@ -98,25 +103,43 @@ struct DetailTimeline: View {
                     }
                     ctx.fill(path, with: .color(theme.wave))
                 }
-                // markers like in Avid: a coloured dot on the marker lane, spans as a bar to their end
-                for m in model.markers {
-                    let i = info.index(ofTcFrame: m.frame)
-                    guard i + m.duration >= a, i <= b else { continue }
-                    let px = x(i)
-                    if m.duration > 1 {
-                        ctx.fill(Path(roundedRect: CGRect(x: px, y: 30, width: max(2, x(i + m.duration) - px), height: 6), cornerRadius: 3),
-                                 with: .color(m.color.color.opacity(0.75)))
-                    }
-                    let dot = Path(ellipseIn: CGRect(x: px - 6, y: 27, width: 12, height: 12))
-                    ctx.fill(dot, with: .color(m.color.color))
-                    ctx.stroke(dot, with: .color(.black.opacity(0.55)), lineWidth: 1)
-                    if m.id == model.selection {
-                        ctx.stroke(Path(ellipseIn: CGRect(x: px - 8.5, y: 24.5, width: 17, height: 17)), with: .color(theme.text), lineWidth: 1.5)
+                // in / out marks: light area between them, a thin line at each mark (like Avid's marks)
+                if model.markIn != nil || model.markOut != nil {
+                    let l = model.markIn.map(x) ?? 0, r = model.markOut.map { x($0 + 1) } ?? size.width
+                    ctx.fill(Path(CGRect(x: l, y: Lane.top, width: max(1, r - l), height: size.height - Lane.top)), with: .color(theme.text.opacity(0.07)))
+                    for e in [model.markIn.map(x), model.markOut.map { x($0 + 1) }].compactMap({ $0 }) {
+                        ctx.fill(Path(CGRect(x: e - 0.5, y: 0, width: 1, height: size.height)), with: .color(theme.muted))
                     }
                 }
-                // playhead
-                let p = x(model.index)
-                ctx.fill(Path(CGRect(x: p - 1, y: 0, width: 2, height: size.height)), with: .color(theme.playhead))
+                // playhead (under the markers, so a selected marker at the playhead stays visible)
+                let ph = x(model.index)
+                ctx.fill(Path(CGRect(x: ph - 1.5, y: 0, width: 3, height: size.height)), with: .color(theme.playhead))
+                // markers like in Avid: slim upright bars with round ends; overlapping ones move into extra rows so all stay visible
+                let (placed, rows) = place(range: range, width: size.width)
+                for p in placed {
+                    let r = Lane.dot(row: p.row, rows: rows)
+                    let m = p.marker
+                    // spanned marker: a marker at start and end, joined by a thin line slightly above the middle
+                    if m.duration > 1 {
+                        ctx.fill(Path(CGRect(x: p.x, y: r.midY - 2, width: max(0, p.end - p.x), height: 1)), with: .color(m.color.color))
+                    }
+                    let sel = m.id == model.selection
+                    for bx in m.duration > 1 ? [p.x, p.end] : [p.x] {
+                        // selected: looks pressed in (sunk by 1 pt, darker, shadow at the top edge) with a thin outline
+                        let rect = r.offsetBy(dx: bx, dy: sel ? 1 : 0)
+                        let dot = Path(roundedRect: rect, cornerRadius: rect.width / 2)
+                        ctx.fill(dot, with: .color(m.color.color))
+                        if sel {
+                            ctx.fill(dot, with: .color(.black.opacity(0.28)))
+                            ctx.fill(Path(roundedRect: CGRect(x: rect.minX + 1, y: rect.minY + 1, width: rect.width - 2, height: 2.5), cornerRadius: 1.25),
+                                     with: .color(.black.opacity(0.45)))
+                            // white on dark markers, dark on light ones, so the outline always shows
+                            ctx.stroke(dot, with: .color(m.color.isLight ? Color(white: 0.06) : .white), lineWidth: 1)
+                        } else {
+                            ctx.stroke(dot, with: .color(.black.opacity(0.7)), lineWidth: 1)
+                        }
+                    }
+                }
             }
             .background(theme.panel)
             .contentShape(Rectangle())
@@ -136,19 +159,56 @@ struct DetailTimeline: View {
                     model.seek(toIndex: r.0 + Int((f * CGFloat(r.1 - r.0)).rounded()))
                 }
                 .onEnded { _ in frozen = nil })
+            // pointing hand over a marker: it can be clicked
+            .onContinuousHover { phase in
+                if case .active(let p) = phase, marker(at: p, width: geo.size.width, range: frozen ?? detailRange(model)) != nil {
+                    NSCursor.pointingHand.set()
+                } else {
+                    NSCursor.arrow.set()
+                }
+            }
             .overlay(ScrollCatcher { dx in model.step(dx) })
         }
         .overlay(Rectangle().stroke(theme.line, lineWidth: 1))
         .accessibilityLabel(Text("Timeline"))
     }
 
-    private func marker(at p: CGPoint, width: CGFloat, range: (Int, Int)) -> Marker? {
-        guard let info = model.info, p.y > 20, p.y < 46 else { return nil }
+    private struct Placed { let marker: Marker; let x: CGFloat; let end: CGFloat; let row: Int }
+
+    /// Like separate marker tracks in Avid: each visible marker takes the first row where it does not touch its neighbour.
+    private func place(range: (Int, Int), width: CGFloat) -> ([Placed], Int) {
+        guard let info = model.info else { return ([], 1) }
         let span = CGFloat(max(1, range.1 - range.0))
-        return model.markers.first {
-            let x = CGFloat(info.index(ofTcFrame: $0.frame) - range.0) / span * width
-            return abs(x - p.x) < 8
+        let x = { (i: Int) in CGFloat(i - range.0) / span * width }
+        var rowEnd = [CGFloat](repeating: -.infinity, count: Lane.maxRows)
+        var out: [Placed] = []
+        for m in model.markers.sorted(by: { $0.frame < $1.frame }) {
+            let i = info.index(ofTcFrame: m.frame)
+            guard i + m.duration - 1 >= range.0, i <= range.1 else { continue }
+            let px = x(i), end = m.duration > 1 ? x(i + m.duration - 1) : px
+            // shortcut: more than maxRows markers on one spot share the last row, fine for review notes
+            let row = rowEnd.firstIndex { $0 + 12 <= px } ?? rowEnd.indices.min { rowEnd[$0] < rowEnd[$1] }!
+            rowEnd[row] = max(px, end)
+            out.append(Placed(marker: m, x: px, end: end, row: row))
         }
+        return (out, (out.map(\.row).max() ?? 0) + 1)
+    }
+
+    private func marker(at p: CGPoint, width: CGFloat, range: (Int, Int)) -> Marker? {
+        let (placed, rows) = place(range: range, width: width)
+        let hit = { (x: CGFloat, row: Int) in Lane.dot(row: row, rows: rows).offsetBy(dx: x, dy: 0).insetBy(dx: -5, dy: -3).contains(p) }
+        return placed.first { hit($0.x, $0.row) || hit($0.end, $0.row) }?.marker
+    }
+}
+
+/// Geometry of the marker lane in the detail timeline (shared by drawing and clicking).
+private enum Lane {
+    static let top: CGFloat = 21, height: CGFloat = 36, maxRows = 3
+    /// Marker bar centred on x = 0 for a row; smaller when the lane is split into more rows.
+    static func dot(row: Int, rows: Int) -> CGRect {
+        let rowH = height / CGFloat(rows)
+        let h = min(8, rowH - 2), w: CGFloat = 4 // a short slim upright bar with round ends (user's pick: 8 × 4)
+        return CGRect(x: -w / 2, y: top + rowH * (CGFloat(row) + 0.5) - h / 2, width: w, height: h)
     }
 }
 

@@ -25,14 +25,12 @@ struct MarkTheRoughcutApp: App {
                     delegate.model = model
                     Keys.install(model)
                     AppSettings.shared.apply()
+                    Updater.shared.start()
                 }
         }
         .commands {
             CommandGroup(replacing: .appInfo) {
-                Button("About MarkTheRoughcut") {
-                    NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { NotificationCenter.default.post(name: .showAbout, object: nil) }
-                }
+                Button("About MarkTheRoughcut") { openWindow(id: "about") }
             }
             CommandGroup(replacing: .help) {
                 Button("MarkTheRoughcut Manual") { openWindow(id: "manual") }.keyboardShortcut("?")
@@ -51,6 +49,9 @@ struct MarkTheRoughcutApp: App {
         }
 
         Settings { SettingsView() }
+
+        Window("About MarkTheRoughcut", id: "about") { AboutView() }
+            .windowResizability(.contentSize)
 
         Window("Manual", id: "manual") { ManualView() }
             .defaultSize(width: 640, height: 720)
@@ -128,6 +129,9 @@ enum Keys {
             case "j": model.shuttle("j")
             case "k": model.shuttle("k")
             case "l": model.shuttle("l")
+            case "i": model.setMark(in: true)
+            case "o": model.setMark(in: false)
+            case "g": model.markIn = nil; model.markOut = nil
             case "m":
                 if model.userName.trimmingCharacters(in: .whitespaces).isEmpty {
                     model.pendingMarker = true

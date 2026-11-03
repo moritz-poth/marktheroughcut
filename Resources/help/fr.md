@@ -23,6 +23,7 @@ MarkTheRoughcut est un lecteur simple pour visionner un montage. Vous regardez l
 - **⌥← ⌥→** – marqueur précédent / suivant
 - **↑ ↓** – zoomer la timeline
 - **M** – placer un marqueur à la tête de lecture
+- **I / O** – entrée / sortie pour un marqueur avec durée ; **G** efface les deux
 - **⌫** – supprimer le marqueur sélectionné
 - **Échap** ou **Entrée** – terminer un commentaire (un clic ailleurs fait de même)
 
@@ -31,6 +32,7 @@ MarkTheRoughcut est un lecteur simple pour visionner un montage. Vous regardez l
 - Appuyez sur **M** pour placer un marqueur à la tête de lecture. Le champ de commentaire s’ouvre aussitôt – il suffit de taper.
 - La première fois, MarkTheRoughcut demande votre nom. Il apparaît avec chaque marqueur dans Avid, pour que le monteur sache qui l’a écrit. Votre nom s’affiche au-dessus de la liste ; cliquez sur le crayon pour le changer.
 - Cliquez sur un marqueur dans la liste ou dans la timeline pour y sauter. Cliquez sur son commentaire pour le modifier.
+- **Marqueur avec durée :** appuyez sur **I** au début et sur **O** à la fin, puis sur **M**. Le marqueur va de l’entrée à la sortie : un marqueur au début et à la fin, reliés par une fine ligne. **G** efface l’entrée et la sortie.
 - Cliquez sur le point coloré pour choisir une couleur. Les nouveaux marqueurs prennent la dernière couleur choisie.
 - Les marqueurs sont enregistrés automatiquement à côté de la vidéo (« <nom de la vidéo>.markers.json »). Rouvrez la vidéo plus tard : ils sont tous là.
 
@@ -48,6 +50,7 @@ MarkTheRoughcut est un lecteur simple pour visionner un montage. Vous regardez l
 ## Réglages
 
 - **MarkTheRoughcut → Réglages…** (⌘,) : apparence claire ou sombre et langue (English, Deutsch, Français, Español). Changer de langue redémarre l’app ; vos marqueurs sont enregistrés.
+- **Mises à jour :** MarkTheRoughcut recherche lui-même les nouvelles versions sur GitHub et affiche un avis en haut de la fenêtre – **Installer la mise à jour** remplace l’app et la redémarre. Dans les Réglages, vous pouvez aussi cliquer sur **Rechercher des mises à jour**.
 
 ## Problèmes
 

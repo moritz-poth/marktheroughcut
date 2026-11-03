@@ -23,6 +23,7 @@ MarkTheRoughcut ist ein einfacher Player zum Abnehmen eines Schnitts. Du schaust
 - **⌥← ⌥→** – voriger / nächster Marker
 - **↑ ↓** – Timeline zoomen
 - **M** – Marker an der Abspielposition setzen
+- **I / O** – In / Out für einen Marker mit Dauer setzen; **G** löscht beide
 - **⌫** – ausgewählten Marker löschen
 - **Esc** oder **Enter** – Kommentar beenden (ein Klick irgendwo anders tut dasselbe)
 
@@ -31,6 +32,7 @@ MarkTheRoughcut ist ein einfacher Player zum Abnehmen eines Schnitts. Du schaust
 - Drück **M**, um an der Abspielposition einen Marker zu setzen. Das Kommentarfeld öffnet sich sofort – einfach lostippen.
 - Beim ersten Mal fragt MarkTheRoughcut nach deinem Namen. Er steht in Avid bei jedem Marker, damit der Schnitt weiß, von wem er ist. Dein Name steht über der Markerliste; mit dem Stift änderst du ihn.
 - Ein Klick auf einen Marker in der Liste oder in der Timeline springt dorthin. Ein Klick auf den Kommentar bearbeitet ihn.
+- **Marker mit Dauer:** am Anfang **I**, am Ende **O** drücken, dann **M**. Der Marker reicht von In bis Out: ein Marker am Anfang und am Ende, verbunden durch eine dünne Linie. **G** löscht In und Out.
 - Ein Klick auf den farbigen Punkt wählt die Farbe. Neue Marker bekommen die zuletzt gewählte Farbe.
 - Marker werden automatisch neben dem Video gespeichert (als „<Videoname>.markers.json“). Öffnest du das Video später wieder, sind alle wieder da.
 
@@ -48,6 +50,7 @@ MarkTheRoughcut ist ein einfacher Player zum Abnehmen eines Schnitts. Du schaust
 ## Einstellungen
 
 - **MarkTheRoughcut → Einstellungen…** (⌘,): helles oder dunkles Erscheinungsbild und die Sprache (English, Deutsch, Français, Español). Beim Sprachwechsel startet die App neu; deine Marker sind gespeichert.
+- **Updates:** MarkTheRoughcut sucht selbst auf GitHub nach neuen Versionen und zeigt oben im Fenster einen Hinweis – **Update installieren** ersetzt die App und startet sie neu. In den Einstellungen kannst du auch auf **Nach Updates suchen** klicken.
 
 ## Probleme
 
