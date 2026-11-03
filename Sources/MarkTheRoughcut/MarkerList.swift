@@ -8,6 +8,24 @@ struct MarkerList: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            // the name that goes into Avid with every new marker – always visible, editable
+            HStack(spacing: 8) {
+                Image(systemName: "person").font(.system(size: 11)).foregroundColor(theme.faint)
+                Text(model.userName.isEmpty ? String(localized: "No name yet") : model.userName)
+                    .font(.mono(12, semibold: !model.userName.isEmpty))
+                    .foregroundColor(model.userName.isEmpty ? theme.faint : theme.text)
+                    .lineLimit(1).truncationMode(.tail)
+                Spacer()
+                Button { model.needsName = true } label: {
+                    Image(systemName: "pencil").font(.system(size: 11)).foregroundColor(theme.muted)
+                        .frame(width: 22, height: 22).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help(Text("Change name"))
+                .accessibilityLabel(Text("Change name"))
+            }
+            .padding(.horizontal, 14).padding(.vertical, 8)
+            Rectangle().fill(theme.line).frame(height: 1)
             HStack {
                 Text("MARKERS").font(.mono(11)).tracking(1.5).foregroundColor(theme.muted)
                 Spacer()
@@ -80,6 +98,12 @@ struct MarkerRow: View {
                 .foregroundColor(theme.text)
                 .lineLimit(1...8)
                 .focused($focused)
+                // while typing: a quiet input box (lighter surface, darker outline)
+                .padding(.horizontal, focused ? 8 : 0)
+                .padding(.vertical, focused ? 6 : 0)
+                .background(RoundedRectangle(cornerRadius: 5).fill(focused ? theme.field : .clear))
+                .overlay(RoundedRectangle(cornerRadius: 5).stroke(focused ? theme.fieldLine : .clear, lineWidth: 1))
+                .animation(.easeOut(duration: 0.12), value: focused)
         }
         .padding(.horizontal, 14).padding(.vertical, 10)
         .background(selected ? theme.text.opacity(0.07) : Color.clear)

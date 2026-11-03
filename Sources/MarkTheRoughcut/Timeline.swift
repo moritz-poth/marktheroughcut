@@ -2,7 +2,8 @@ import AppKit
 import MarkerCore
 import SwiftUI
 
-/// Whole video at a glance: thumbnails, every marker, the playhead and the range the detail timeline shows.
+/// Whole video at a glance: thumbnails, the playhead and the range the detail timeline shows (markers only
+/// appear in the timeline below – lines over the pictures were too busy).
 /// Click or drag to jump.
 struct OverviewBar: View {
     @ObservedObject var model: PlayerModel
@@ -26,11 +27,6 @@ struct OverviewBar: View {
                     // range of the detail timeline
                     let (a, b) = detailRange(model)
                     ctx.stroke(Path(CGRect(x: x(a), y: 0.5, width: max(2, x(b) - x(a)), height: size.height - 1)), with: .color(theme.text.opacity(0.7)), lineWidth: 1)
-                    for m in model.markers {
-                        let i = info.index(ofTcFrame: m.frame)
-                        let rect = CGRect(x: x(i) - 1, y: 0, width: max(2, x(i + m.duration - 1) - x(i) + 2), height: size.height)
-                        ctx.fill(Path(rect), with: .color(m.color.color))
-                    }
                     ctx.fill(Path(CGRect(x: x(model.index) - 1, y: 0, width: 2, height: size.height)), with: .color(theme.playhead))
                 }
             }
@@ -87,23 +83,36 @@ struct DetailTimeline: View {
                     t += step
                 }
                 ctx.fill(Path(CGRect(x: 0, y: 22, width: size.width, height: 1)), with: .color(theme.line))
-                // markers: a flag for points, a bar for spans
+                // waveform: quiet, mirrored around the middle of the lower lane
+                if let wave = model.waveform {
+                    let top: CGFloat = 46, mid = top + (size.height - top) / 2, half = (size.height - top) / 2 - 3
+                    let secPerPx = Double(span) / Double(size.width) / info.fpsReal
+                    let startSec = Double(a) / info.fpsReal
+                    var path = Path()
+                    var px: CGFloat = 0
+                    while px < size.width {
+                        let s0 = startSec + Double(px) * secPerPx
+                        let h = max(0.5, CGFloat(wave.peak(from: s0, to: s0 + secPerPx)) * half)
+                        path.addRect(CGRect(x: px, y: mid - h, width: 1, height: h * 2))
+                        px += 1
+                    }
+                    ctx.fill(path, with: .color(theme.wave))
+                }
+                // markers like in Avid: a coloured dot on the marker lane, spans as a bar to their end
                 for m in model.markers {
                     let i = info.index(ofTcFrame: m.frame)
                     guard i + m.duration >= a, i <= b else { continue }
                     let px = x(i)
-                    let selected = m.id == model.selection
                     if m.duration > 1 {
-                        ctx.fill(Path(CGRect(x: px, y: 30, width: max(2, x(i + m.duration) - px), height: 14)), with: .color(m.color.color.opacity(0.6)))
+                        ctx.fill(Path(roundedRect: CGRect(x: px, y: 30, width: max(2, x(i + m.duration) - px), height: 6), cornerRadius: 3),
+                                 with: .color(m.color.color.opacity(0.75)))
                     }
-                    ctx.fill(Path(CGRect(x: px - 0.5, y: 26, width: 1, height: size.height - 26)), with: .color(m.color.color.opacity(0.8)))
-                    var flag = Path()
-                    flag.move(to: CGPoint(x: px, y: 26))
-                    flag.addLine(to: CGPoint(x: px + 9, y: 31))
-                    flag.addLine(to: CGPoint(x: px, y: 36))
-                    flag.closeSubpath()
-                    ctx.fill(flag, with: .color(m.color.color))
-                    if selected { ctx.stroke(flag, with: .color(theme.text), lineWidth: 1.5) }
+                    let dot = Path(ellipseIn: CGRect(x: px - 6, y: 27, width: 12, height: 12))
+                    ctx.fill(dot, with: .color(m.color.color))
+                    ctx.stroke(dot, with: .color(.black.opacity(0.55)), lineWidth: 1)
+                    if m.id == model.selection {
+                        ctx.stroke(Path(ellipseIn: CGRect(x: px - 8.5, y: 24.5, width: 17, height: 17)), with: .color(theme.text), lineWidth: 1.5)
+                    }
                 }
                 // playhead
                 let p = x(model.index)
@@ -134,11 +143,11 @@ struct DetailTimeline: View {
     }
 
     private func marker(at p: CGPoint, width: CGFloat, range: (Int, Int)) -> Marker? {
-        guard let info = model.info, p.y < 40 else { return nil }
+        guard let info = model.info, p.y > 20, p.y < 46 else { return nil }
         let span = CGFloat(max(1, range.1 - range.0))
         return model.markers.first {
             let x = CGFloat(info.index(ofTcFrame: $0.frame) - range.0) / span * width
-            return abs(x + 3 - p.x) < 7
+            return abs(x - p.x) < 8
         }
     }
 }

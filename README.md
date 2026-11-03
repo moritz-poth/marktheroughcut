@@ -2,7 +2,7 @@
 
 A simple Mac player for directors: watch a rough cut, set markers with comments and send them to the editor as a marker list for **Avid Media Composer**.
 
-*Deutsch: Die App folgt der Sprache des Macs (Englisch oder Deutsch).*
+*English · Deutsch · Français · Español – Settings (⌘,) → Language. Manual: Help → MarkTheRoughcut Manual.*
 
 > **Beta.** Please report problems in [Issues](../../issues).
 
@@ -10,8 +10,9 @@ A simple Mac player for directors: watch a rough cut, set markers with comments 
 
 - Plays everything QuickTime Player plays (MOV, MP4 with H.264, HEVC, ProRes …).
 - **Timecode from the file** – markers land exactly where they belong in Avid.
-- **Overview bar** with thumbnails and all markers, plus a **zoomable timeline** around the playhead (↑/↓).
-- Markers with colour and comment; saved automatically next to the video.
+- **Overview bar** with thumbnails, plus a **zoomable timeline** around the playhead (↑/↓) with Avid-style markers and the sound as a waveform.
+- Markers with colour and comment; saved automatically next to the video. Your name is shown above the marker list.
+- Light or dark appearance, built-in manual in four languages.
 - **Export** an Avid marker list (Markers window → Import Markers). Characters Avid stumbles over (umlauts, “/”, quotes, line breaks) are replaced, so every marker arrives complete.
 - **Import** a marker list exported from Avid – e.g. the editor's notes for the director.
 
@@ -27,7 +28,7 @@ A simple Mac player for directors: watch a rough cut, set markers with comments 
 | ↑ ↓ | Zoom the timeline around the playhead |
 | M | Set a marker at the playhead |
 | ⌫ | Delete the selected marker |
-| Esc / Enter | Leave the comment field |
+| Esc / Enter | Leave the comment field (or click anywhere else) |
 
 The first marker asks for your name – it appears with every marker in Avid.
 

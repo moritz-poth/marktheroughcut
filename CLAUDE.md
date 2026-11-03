@@ -12,14 +12,18 @@ Native Mac video player (Swift, SwiftUI + AVKit, macOS 13+, universal) for direc
 - `Marker.txt` in the project folder is a real, private Avid export (names, comments): git-ignored, never commit it. `LocalSampleTests` uses it when present.
 
 ## UI / keys
-- Dark only (Theme in Theme.swift, JetBrains Mono, Ferry colours).
-- Overview bar (thumbnails, all markers, playhead, detail range) + detail timeline (zoom ↑/↓ around the playhead, TC ruler, marker flags, span bars; drag or swipe to scrub; click a flag to select).
+- Dark by default, light optional (`AppSettings.dark`, Theme in Theme.swift, JetBrains Mono, Ferry colours). Settings window (⌘,): appearance switch, language dropdown, About tab (GPL notice, source, license, third-party). `Switch` and `Dropdown` are the same components as in Mountpoint.
+- Languages en (default, not the system language), de, fr, es: `AppleLanguages` is set from UserDefaults `language` at launch; switching restarts the app. Every UI string goes into all three `.lproj` files (`LocalizationTests` fails otherwise); the manual lives in `Resources/help/<code>.md` (Help → Manual, rendered by `ManualView`; `ManualTests` checks all four).
+- Overview bar: thumbnails, playhead, detail range – no markers (the user found lines over the pictures too busy). Detail timeline: TC ruler, marker lane with Avid-style coloured dots (spans as a bar), quiet waveform below (`Waveform`, 200 peaks/s from 8 kHz mono); zoom ↑/↓ around the playhead; drag or swipe to scrub; click a dot to select.
+- The user's name is always shown above the marker list with a pencil to change it.
+- Comment editing shows a quiet input box (`Theme.field` / `fieldLine`). Any click outside the edited text view ends editing (mouse-down monitor in `Keys`), so "M" never types into a comment.
 - Keys (Keys in App.swift, a local NSEvent monitor): Space, J/K/L, ←/→ frame, ⇧←/→ second, ⌥←/→ previous/next marker, ↑/↓ zoom, M marker, ⌫ delete selected, Esc/Enter leave a comment. Plain keys only act when no text field is edited; sheets and panels get every key.
 - Marker list rows are bound by marker id (`PlayerModel.binding(for:)`), never position-based `ForEach($array)` – that wrote comments into the neighbour after an insert.
 - UI strings English in code, German in `Resources/de.lproj/Localizable.strings` (app follows the system language).
 
 ## Build / test
-`swift test` (VideoInfoTests generate test videos with Homebrew ffmpeg, skipped without it), `scripts/build-app.sh` → `dist/MarkTheRoughcut.app` + zip (ad-hoc signed). Visual check: launch the app with a test video and `screencapture -l <window id>`; keys can be sent with `osascript … System Events key code`. Reset test settings afterwards (`defaults delete io.github.moritz-poth.marktheroughcut`).
+`swift test` (VideoInfoTests generate test videos with Homebrew ffmpeg, skipped without it), `scripts/build-app.sh` → `dist/MarkTheRoughcut.app` + zip (ad-hoc signed). Visual check: launch the app with a test video and `screencapture -l <window id>`; keys can be sent with `osascript … System Events key code`. Synthetic clicks via System Events do not reach the app like real ones – post CGEvents for click tests.
 
 ## Open
-App icon, span markers set in the app (I/O), README screenshots, first release.
+App icon, span markers set in the app (I/O), README screenshots, first release, user test of the export in real Avid.
+Testing note: the user uses the app on this Mac (name in UserDefaults) – never `defaults delete` the whole domain; restore single keys you change.

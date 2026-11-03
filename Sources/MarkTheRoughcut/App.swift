@@ -7,8 +7,11 @@ import SwiftUI
 struct MarkTheRoughcutApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @StateObject private var model = PlayerModel()
+    @Environment(\.openWindow) private var openWindow
 
     init() {
+        // English unless the user picked another language in Settings (read before the first text is loaded)
+        UserDefaults.standard.set([UserDefaults.standard.string(forKey: "language") ?? "en"], forKey: "AppleLanguages")
         for url in Bundle.main.urls(forResourcesWithExtension: "ttf", subdirectory: "fonts") ?? [] {
             CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
         }
@@ -21,9 +24,19 @@ struct MarkTheRoughcutApp: App {
                 .onAppear {
                     delegate.model = model
                     Keys.install(model)
+                    AppSettings.shared.apply()
                 }
         }
         .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("About MarkTheRoughcut") {
+                    NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { NotificationCenter.default.post(name: .showAbout, object: nil) }
+                }
+            }
+            CommandGroup(replacing: .help) {
+                Button("MarkTheRoughcut Manual") { openWindow(id: "manual") }.keyboardShortcut("?")
+            }
             CommandGroup(replacing: .newItem) {
                 Button("Open Video…") { openVideo(model) }.keyboardShortcut("o")
             }
@@ -36,6 +49,11 @@ struct MarkTheRoughcutApp: App {
                 Button("Change Name…") { model.needsName = true }
             }
         }
+
+        Settings { SettingsView() }
+
+        Window("Manual", id: "manual") { ManualView() }
+            .defaultSize(width: 640, height: 720)
     }
 }
 
@@ -61,10 +79,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 enum Keys {
     private static var monitor: Any?
 
+    private static var clicks: Any?
+
     static func install(_ model: PlayerModel) {
         guard monitor == nil else { return }
         monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { e in
             handle(e, model) ? nil : e
+        }
+        // a click anywhere outside the comment being edited ends editing – otherwise "M" would type an m
+        clicks = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { e in
+            if let window = e.window, let editor = window.firstResponder as? NSTextView {
+                let p = editor.convert(e.locationInWindow, from: nil)
+                if !editor.bounds.contains(p) { window.makeFirstResponder(nil) }
+            }
+            return e
         }
     }
 
@@ -101,7 +129,12 @@ enum Keys {
             case "k": model.shuttle("k")
             case "l": model.shuttle("l")
             case "m":
-                if model.userName.trimmingCharacters(in: .whitespaces).isEmpty { model.needsName = true } else { model.addMarker() }
+                if model.userName.trimmingCharacters(in: .whitespaces).isEmpty {
+                    model.pendingMarker = true
+                    model.needsName = true
+                } else {
+                    model.addMarker()
+                }
             default: return false
             }
         }

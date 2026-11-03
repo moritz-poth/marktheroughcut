@@ -1,7 +1,7 @@
 import MarkerCore
 import SwiftUI
 
-/// Same typography and colours as MediaFiles Ferry and Mountpoint. Dark by default (grading rooms).
+/// Same typography and colours as MediaFiles Ferry and Mountpoint. Dark by default (grading rooms), light optional.
 struct Theme {
     var dark = true
     private func c(_ d: UInt32, _ l: UInt32) -> Color {
@@ -18,6 +18,10 @@ struct Theme {
     var onPrimary: Color { c(0x1f2225, 0xf5f5f3) }
     var playhead: Color { c(0xf85149, 0xc62828) }
     var warning: Color { c(0xf0883e, 0xe16f24) }
+    /// Comment being edited: slightly lighter surface, slightly darker outline – visible but quiet.
+    var field: Color { c(0x272a2d, 0xfbfbf9) }
+    var fieldLine: Color { c(0x0e1011, 0xb4b8bc) }
+    var wave: Color { c(0x5a6066, 0xa4a9ae) }
 }
 
 extension Font {
@@ -58,17 +62,57 @@ extension MarkerColor {
 struct FerryButtonStyle: ButtonStyle {
     let theme: Theme
     var primary = false
+    var height: CGFloat = 26
     @Environment(\.isEnabled) private var enabled
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.mono(12, semibold: primary))
             .foregroundColor(!enabled ? theme.faint : primary ? theme.onPrimary : theme.text)
             .padding(.horizontal, 12)
-            .frame(height: 26)
+            .frame(height: height)
             .background(RoundedRectangle(cornerRadius: 6).fill(primary && enabled ? theme.primary.opacity(configuration.isPressed ? 0.85 : 1)
                                                              : theme.text.opacity(configuration.isPressed ? 0.12 : 0)))
             .overlay(RoundedRectangle(cornerRadius: 6).stroke(primary && enabled ? theme.primary : theme.line, lineWidth: 1))
             .contentShape(Rectangle())
             .fixedSize()
+    }
+}
+
+/// Drop-down that looks like the other buttons (own chevron, system indicator hidden) – lines up flush.
+struct Dropdown<Content: View>: View {
+    let title: Text
+    let theme: Theme
+    @ViewBuilder let content: () -> Content
+    var body: some View {
+        Menu(content: content) {
+            HStack(spacing: 6) {
+                title
+                Image(systemName: "chevron.down").font(.system(size: 8, weight: .semibold))
+            }
+        }
+        .menuStyle(.button)
+        .buttonStyle(FerryButtonStyle(theme: theme))
+        .menuIndicator(.hidden)
+        .fixedSize()
+    }
+}
+
+/// On/off switch in the Ferry look.
+struct Switch: View {
+    let on: Bool
+    let theme: Theme
+    let action: () -> Void
+    var body: some View {
+        Button(action: action) {
+            ZStack(alignment: on ? .trailing : .leading) {
+                Capsule().fill(on ? theme.primary : theme.line)
+                Circle().fill(on ? theme.onPrimary : (theme.dark ? theme.muted : theme.background)).padding(2)
+            }
+            .frame(width: 34, height: 20)
+            .animation(.easeOut(duration: 0.15), value: on)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(on ? .isSelected : [])
     }
 }

@@ -55,3 +55,30 @@
 "The marker list could not be read: %@" = "Die Markerliste konnte nicht gelesen werden: %@";
 "The marker list could not be saved: %@" = "Die Markerliste konnte nicht gespeichert werden: %@";
 "The markers could not be saved: %@" = "Die Marker konnten nicht gespeichert werden: %@";
+
+/* Name über der Markerliste */
+"No name yet" = "Noch kein Name";
+"Change name" = "Name ändern";
+"Cancel" = "Abbrechen";
+
+/* Einstellungen */
+"General" = "Allgemein";
+"About" = "Über";
+"Appearance" = "Erscheinungsbild";
+"Light" = "Hell";
+"Dark" = "Dunkel";
+"Dark appearance" = "Dunkles Erscheinungsbild";
+"Language" = "Sprache";
+"Changing the language restarts MarkTheRoughcut. Your markers are saved." = "Beim Wechsel der Sprache startet MarkTheRoughcut neu. Deine Marker sind gespeichert.";
+"About MarkTheRoughcut" = "Über MarkTheRoughcut";
+"Version %@" = "Version %@";
+"MarkTheRoughcut is free software: you can redistribute and modify it under the terms of the GNU General Public License, version 3 or later." = "MarkTheRoughcut ist freie Software: Du darfst sie unter den Bedingungen der GNU General Public License, Version 3 oder neuer, weitergeben und verändern.";
+"It comes with ABSOLUTELY NO WARRANTY – use at your own risk." = "Sie wird OHNE JEDE GEWÄHRLEISTUNG bereitgestellt – Nutzung auf eigenes Risiko.";
+"Source code" = "Quellcode";
+"License" = "Lizenz";
+"JetBrains Mono font – SIL Open Font License 1.1" = "Schrift JetBrains Mono – SIL Open Font License 1.1";
+"Avid and Media Composer are trademarks of Avid Technology, Inc. MarkTheRoughcut is not affiliated with Avid." = "Avid und Media Composer sind Marken von Avid Technology, Inc. MarkTheRoughcut steht nicht mit Avid in Verbindung.";
+
+/* Handbuch */
+"Manual" = "Handbuch";
+"MarkTheRoughcut Manual" = "MarkTheRoughcut-Handbuch";

@@ -1,0 +1,82 @@
+/* Fenêtre */
+"Drop a video here" = "Déposez une vidéo ici";
+"Open Video…" = "Ouvrir une vidéo…";
+"MOV and MP4 – everything QuickTime Player plays." = "MOV et MP4 – tout ce que lit QuickTime Player.";
+"Close" = "Fermer";
+"Overview" = "Vue d’ensemble";
+"Timeline" = "Timeline";
+
+/* Touches */
+"Space" = "Espace";
+"Play" = "Lecture";
+"Shuttle" = "Shuttle";
+"Frame" = "Image";
+"Second" = "Seconde";
+"Zoom" = "Zoom";
+"Marker" = "Marqueur";
+"Jump" = "Sauter";
+
+/* Marqueurs */
+"MARKERS" = "MARQUEURS";
+"Markers" = "Marqueurs";
+"Press M to set a marker at the playhead." = "Appuyez sur M pour placer un marqueur à la tête de lecture.";
+"Comment" = "Commentaire";
+"Colour" = "Couleur";
+"Delete marker" = "Supprimer le marqueur";
+"Red" = "Rouge";
+"Green" = "Vert";
+"Blue" = "Bleu";
+"Cyan" = "Cyan";
+"Magenta" = "Magenta";
+"Yellow" = "Jaune";
+"Black" = "Noir";
+"White" = "Blanc";
+
+/* Nom */
+"Your name" = "Votre nom";
+"It appears with every marker in Avid, so the editor knows who wrote it." = "Il apparaît avec chaque marqueur dans Avid, pour que le monteur sache qui l’a écrit.";
+"Name" = "Nom";
+"OK" = "OK";
+"Change Name…" = "Changer de nom…";
+"No name yet" = "Pas encore de nom";
+"Change name" = "Changer de nom";
+"Cancel" = "Annuler";
+
+/* Import / export */
+"Import Avid Markers…" = "Importer des marqueurs Avid…";
+"Export Avid Markers…" = "Exporter des marqueurs Avid…";
+"Choose a marker list exported from Avid (Markers window → Export Markers)." = "Choisissez une liste de marqueurs exportée depuis Avid (fenêtre Markers → Export Markers).";
+"In Avid: Markers window → Import Markers." = "Dans Avid : fenêtre Markers → Import Markers.";
+"%lld markers imported." = "%lld marqueurs importés.";
+"%lld lie outside this video’s timecode and were left out." = "%lld se trouvent hors du timecode de cette vidéo et ont été ignorés.";
+"%lld lines could not be read." = "%lld lignes n’ont pas pu être lues.";
+
+/* Messages */
+"This file cannot be played. MarkTheRoughcut plays what QuickTime Player plays (e.g. MOV and MP4 with H.264, HEVC or ProRes)." = "Ce fichier ne peut pas être lu. MarkTheRoughcut lit ce que lit QuickTime Player (p. ex. MOV et MP4 en H.264, HEVC ou ProRes).";
+"This file has no timecode. Markers start at 00:00:00:00 – they will only line up in Avid if the clip there starts at 00:00:00:00 too." = "Ce fichier n’a pas de timecode. Les marqueurs commencent à 00:00:00:00 – ils ne tomberont juste dans Avid que si le clip y commence aussi à 00:00:00:00.";
+"The video could not be opened: %@" = "Impossible d’ouvrir la vidéo : %@";
+"The marker list could not be read: %@" = "Impossible de lire la liste de marqueurs : %@";
+"The marker list could not be saved: %@" = "Impossible d’enregistrer la liste de marqueurs : %@";
+"The markers could not be saved: %@" = "Impossible d’enregistrer les marqueurs : %@";
+
+/* Réglages */
+"General" = "Général";
+"About" = "À propos";
+"Appearance" = "Apparence";
+"Light" = "Clair";
+"Dark" = "Sombre";
+"Dark appearance" = "Apparence sombre";
+"Language" = "Langue";
+"Changing the language restarts MarkTheRoughcut. Your markers are saved." = "Changer de langue redémarre MarkTheRoughcut. Vos marqueurs sont enregistrés.";
+"About MarkTheRoughcut" = "À propos de MarkTheRoughcut";
+"Version %@" = "Version %@";
+"MarkTheRoughcut is free software: you can redistribute and modify it under the terms of the GNU General Public License, version 3 or later." = "MarkTheRoughcut est un logiciel libre : vous pouvez le redistribuer et le modifier selon les termes de la GNU General Public License, version 3 ou ultérieure.";
+"It comes with ABSOLUTELY NO WARRANTY – use at your own risk." = "Il est fourni SANS AUCUNE GARANTIE – utilisation à vos propres risques.";
+"Source code" = "Code source";
+"License" = "Licence";
+"JetBrains Mono font – SIL Open Font License 1.1" = "Police JetBrains Mono – SIL Open Font License 1.1";
+"Avid and Media Composer are trademarks of Avid Technology, Inc. MarkTheRoughcut is not affiliated with Avid." = "Avid et Media Composer sont des marques d’Avid Technology, Inc. MarkTheRoughcut n’est pas affilié à Avid.";
+
+/* Manuel */
+"Manual" = "Manuel";
+"MarkTheRoughcut Manual" = "Manuel de MarkTheRoughcut";

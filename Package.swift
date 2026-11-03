@@ -9,5 +9,6 @@ let package = Package(
         .target(name: "MarkerCore", path: "Sources/MarkerCore"),
         .executableTarget(name: "MarkTheRoughcut", dependencies: ["MarkerCore"], path: "Sources/MarkTheRoughcut"),
         .testTarget(name: "MarkerCoreTests", dependencies: ["MarkerCore"], path: "Tests/MarkerCoreTests"),
+        .testTarget(name: "AppTests", dependencies: ["MarkTheRoughcut"], path: "Tests/AppTests"),
     ]
 )

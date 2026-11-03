@@ -19,10 +19,13 @@ final class PlayerModel: ObservableObject {
     @Published var zoom: Double = 8
     @Published var notice: String?
     @Published var thumbnails: [NSImage] = []
+    @Published var waveform: Waveform?
     /// Marker whose comment field should take the keyboard focus (just created).
     @Published var editing: Marker.ID?
     /// Ask for the user's name (first marker, or "Change Name…").
     @Published var needsName = false
+    /// The name was asked because M was pressed: set the marker once the name is there.
+    var pendingMarker = false
 
     @AppStorage("userName") var userName = ""
     @AppStorage("markerColor") var defaultColor = MarkerColor.red.rawValue
@@ -62,6 +65,12 @@ final class PlayerModel: ObservableObject {
             notice = info.hasTimecode ? nil : String(localized: "This file has no timecode. Markers start at 00:00:00:00 – they will only line up in Avid if the clip there starts at 00:00:00:00 too.")
             loadMarkers(for: url)
             makeThumbnails(asset, info)
+            waveform = nil
+            Task { [weak self] in
+                // read off the main thread, assign on it – only if the same video is still open
+                let wave = await Task.detached(priority: .utility) { try? await Waveform.load(asset) }.value
+                if self?.url == url { self?.waveform = wave }
+            }
         } catch {
             notice = String(localized: "The video could not be opened: \(error.localizedDescription)")
         }

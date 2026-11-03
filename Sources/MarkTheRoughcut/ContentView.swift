@@ -48,9 +48,10 @@ struct FlowLayout: Layout {
 
 struct ContentView: View {
     @ObservedObject var model: PlayerModel
+    @ObservedObject private var settings = AppSettings.shared
     @State private var askName = false
     @State private var nameDraft = ""
-    private let t = Theme()
+    private var t: Theme { settings.theme }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -75,7 +76,7 @@ struct ContentView: View {
             }
         }
         .background(t.background)
-        .environment(\.colorScheme, .dark)
+        .environment(\.colorScheme, settings.dark ? .dark : .light)
         .onDrop(of: [.fileURL], isTargeted: nil) { providers in
             _ = providers.first?.loadObject(ofClass: URL.self) { url, _ in
                 if let url { Task { @MainActor in await model.open(url) } }
@@ -141,11 +142,15 @@ struct ContentView: View {
                 .onSubmit(saveName)
             HStack {
                 Spacer()
+                if !model.userName.isEmpty {
+                    Button("Cancel") { askName = false; model.needsName = false; model.pendingMarker = false }
+                        .buttonStyle(FerryButtonStyle(theme: t)).keyboardShortcut(.cancelAction)
+                }
                 Button("OK", action: saveName).buttonStyle(FerryButtonStyle(theme: t, primary: true)).keyboardShortcut(.defaultAction)
                     .disabled(nameDraft.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         }
-        .padding(24).frame(width: 380).background(t.background).environment(\.colorScheme, .dark)
+        .padding(24).frame(width: 380).background(t.background).environment(\.colorScheme, settings.dark ? .dark : .light)
     }
 
     private func saveName() {
@@ -154,7 +159,10 @@ struct ContentView: View {
         model.userName = name
         askName = false
         model.needsName = false
-        model.addMarker()
+        if model.pendingMarker {
+            model.pendingMarker = false
+            model.addMarker()
+        }
     }
 }
 

@@ -19,6 +19,7 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp .build/universal/MarkTheRoughcut "$APP/Contents/MacOS/"
 cp -R Resources/fonts "$APP/Contents/Resources/"
 for l in Resources/*.lproj; do [ -d "$l" ] && cp -R "$l" "$APP/Contents/Resources/"; done
+cp -R Resources/help "$APP/Contents/Resources/"   # manual, one Markdown file per language
 cp LICENSE "$APP/Contents/Resources/LICENSE.txt"
 if [ -f scripts/make-icon.swift ]; then
   ICONSET=$(mktemp -d)/AppIcon.iconset
@@ -41,7 +42,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundleDevelopmentRegion</key><string>en</string>
-  <key>CFBundleLocalizations</key><array><string>en</string><string>de</string></array>
+  <key>CFBundleLocalizations</key><array><string>en</string><string>de</string><string>fr</string><string>es</string></array>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>NSHighResolutionCapable</key><true/>
   <key>CFBundleDocumentTypes</key>

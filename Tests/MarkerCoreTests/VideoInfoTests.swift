@@ -43,6 +43,23 @@ struct VideoInfoTests {
         #expect(abs(info.fpsReal - 29.97) < 0.01)
     }
 
+    @Test func waveformFollowsLoudness() async throws {
+        guard let ffmpeg = Self.ffmpeg else { return }
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("mtr-\(UUID().uuidString)-wave.mov")
+        defer { try? FileManager.default.removeItem(at: url) }
+        // 2 s silence, then 2 s loud tone
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: ffmpeg)
+        p.arguments = ["-v", "error", "-y", "-f", "lavfi", "-i", "testsrc2=size=160x90:rate=25", "-f", "lavfi",
+                       "-i", "aevalsrc='0.8*sin(2*PI*440*t)*gte(t,2)':s=48000", "-t", "4", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest", url.path]
+        try p.run()
+        p.waitUntilExit()
+        let wave = try #require(try await Waveform.load(AVURLAsset(url: url)))
+        #expect(abs(Double(wave.peaks.count) / Waveform.rate - 4) < 0.2)
+        #expect(wave.peak(from: 0.2, to: 1.8) < 0.05)
+        #expect(wave.peak(from: 2.5, to: 3.5) > 0.5)
+    }
+
     @Test func noTimecodeStartsAtZero() async throws {
         guard let url = try make("plain.mp4", rate: "24000/1001", seconds: 2, timecode: nil) else { return }
         defer { try? FileManager.default.removeItem(at: url) }
