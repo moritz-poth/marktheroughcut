@@ -19,7 +19,6 @@ Native Mac video player (Swift, SwiftUI + AVKit, macOS 13+, universal) for direc
 - Comment editing shows a quiet input box (`Theme.field` / `fieldLine`). Any click outside the edited text view ends editing (mouse-down monitor in `Keys`), so "M" never types into a comment.
 - Keys (Keys in App.swift, a local NSEvent monitor): Space, J/K/L, ←/→ frame, ⇧←/→ second, ⌥←/→ previous/next marker, ↑/↓ zoom, M marker, ⌫ delete selected, Esc/Enter leave a comment. Plain keys only act when no text field is edited; sheets and panels get every key.
 - Marker list rows are bound by marker id (`PlayerModel.binding(for:)`), never position-based `ForEach($array)` – that wrote comments into the neighbour after an insert.
-- UI strings English in code, German in `Resources/de.lproj/Localizable.strings` (app follows the system language).
 
 ## Build / test
 `swift test` (VideoInfoTests generate test videos with Homebrew ffmpeg, skipped without it), `scripts/build-app.sh` → `dist/MarkTheRoughcut.app` + zip (ad-hoc signed). Visual check: launch the app with a test video and `screencapture -l <window id>`; keys can be sent with `osascript … System Events key code`. Synthetic clicks via System Events do not reach the app like real ones – post CGEvents for click tests.
