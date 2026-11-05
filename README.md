@@ -33,7 +33,7 @@ A simple Mac player for directors: watch a rough cut, set markers with comments 
 | ⌥← / ⌥→ | Previous / next marker |
 | ↑ / ↓ | Zoom the timeline around the playhead |
 | M | Set a marker at the playhead |
-| I / O | Mark in / out – M then sets a marker with a duration |
+| I / O | Mark in / out – if you then set a marker (M), it spans from in to out |
 | G | Clear in and out |
 | ⌫ | Delete the selected marker |
 | Esc / Enter | Leave the comment field (or click anywhere else) |
