@@ -27,13 +27,14 @@ A simple Mac player for directors: watch a rough cut, set markers with comments 
 | Key | |
 |---|---|
 | Space | Play / pause |
-| J K L | Shuttle backwards / stop / forwards (press again for faster) |
-| ← → | One frame |
-| ⇧← ⇧→ | One second |
-| ⌥← ⌥→ | Previous / next marker |
-| ↑ ↓ | Zoom the timeline around the playhead |
+| J / K / L | Shuttle backwards / stop / forwards (press again for faster) |
+| ← / → | One frame |
+| ⇧← / ⇧→ | One second |
+| ⌥← / ⌥→ | Previous / next marker |
+| ↑ / ↓ | Zoom the timeline around the playhead |
 | M | Set a marker at the playhead |
-| I O | Mark in / out – M then sets a marker with a duration; G clears them |
+| I / O | Mark in / out – M then sets a marker with a duration |
+| G | Clear in and out |
 | ⌫ | Delete the selected marker |
 | Esc / Enter | Leave the comment field (or click anywhere else) |
 
