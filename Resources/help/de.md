@@ -2,6 +2,8 @@
 
 MarkTheRoughcut ist ein einfacher Player zum Abnehmen eines Schnitts. Du schaust das Video, setzt Marker mit Kommentaren und schickst sie an den Schnitt, der sie in Avid Media Composer importiert.
 
+![Das Hauptfenster: Video, Übersichtsleiste, Zeitleiste mit Markern und Wellenform, Markerliste](main.png)
+
 ## Video öffnen
 
 - Zieh das Video ins Fenster oder wähle **Ablage → Video öffnen…** (⌘O).
@@ -48,6 +50,8 @@ MarkTheRoughcut ist ein einfacher Player zum Abnehmen eines Schnitts. Du schaust
 - Marker außerhalb des Video-Timecodes werden ausgelassen; MarkTheRoughcut sagt dir, wie viele.
 
 ## Einstellungen
+
+![Einstellungen: Aussehen, Sprache, Updates](settings.png)
 
 - **MarkTheRoughcut → Einstellungen…** (⌘,): helles oder dunkles Erscheinungsbild und die Sprache (English, Deutsch, Français, Español). Beim Sprachwechsel startet die App neu; deine Marker sind gespeichert.
 - **Updates:** MarkTheRoughcut sucht selbst auf GitHub nach neuen Versionen und zeigt oben im Fenster einen Hinweis – **Update installieren** ersetzt die App und startet sie neu. In den Einstellungen kannst du auch auf **Nach Updates suchen** klicken.

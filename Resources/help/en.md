@@ -2,6 +2,8 @@
 
 MarkTheRoughcut is a simple player for reviewing a cut. You watch the video, set markers with comments and send them to the editor, who imports them into Avid Media Composer.
 
+![The main window: video, overview bar, timeline with markers and waveform, marker list](main.png)
+
 ## Opening a video
 
 - Drag the video onto the window, or choose **File → Open Video…** (⌘O).
@@ -48,6 +50,8 @@ MarkTheRoughcut is a simple player for reviewing a cut. You watch the video, set
 - Markers outside the video’s timecode are left out; MarkTheRoughcut tells you how many.
 
 ## Settings
+
+![Settings: appearance, language, updates](settings.png)
 
 - **MarkTheRoughcut → Settings…** (⌘,): light or dark appearance and the language (English, Deutsch, Français, Español). Changing the language restarts the app; your markers are saved.
 - **Updates:** MarkTheRoughcut checks GitHub for new versions on its own and shows a notice at the top of the window – **Install update** replaces the app and restarts it. In Settings you can also click **Check for updates**.

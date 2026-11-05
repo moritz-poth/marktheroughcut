@@ -2,6 +2,8 @@
 
 MarkTheRoughcut es un reproductor sencillo para revisar un montaje. Ves el vídeo, pones marcadores con comentarios y se los envías al montador, que los importa en Avid Media Composer.
 
+![La ventana principal: vídeo, barra general, línea de tiempo con marcadores y forma de onda, lista de marcadores](main.png)
+
 ## Abrir un vídeo
 
 - Arrastra el vídeo a la ventana o elige **Archivo → Abrir vídeo…** (⌘O).
@@ -48,6 +50,8 @@ MarkTheRoughcut es un reproductor sencillo para revisar un montaje. Ves el víde
 - Los marcadores fuera del timecode del vídeo se omiten; MarkTheRoughcut te dice cuántos.
 
 ## Ajustes
+
+![Ajustes: aspecto, idioma, actualizaciones](settings.png)
 
 - **MarkTheRoughcut → Ajustes…** (⌘,): aspecto claro u oscuro y el idioma (English, Deutsch, Français, Español). Al cambiar el idioma, la app se reinicia; tus marcadores están guardados.
 - **Actualizaciones:** MarkTheRoughcut busca por sí mismo nuevas versiones en GitHub y muestra un aviso arriba en la ventana – **Instalar actualización** reemplaza la app y la reinicia. En Ajustes también puedes hacer clic en **Buscar actualizaciones**.

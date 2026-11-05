@@ -2,6 +2,8 @@
 
 MarkTheRoughcut est un lecteur simple pour visionner un montage. Vous regardez la vidéo, placez des marqueurs avec des commentaires et les envoyez au monteur, qui les importe dans Avid Media Composer.
 
+![La fenêtre principale : vidéo, barre d’aperçu, timeline avec marqueurs et forme d’onde, liste des marqueurs](main.png)
+
 ## Ouvrir une vidéo
 
 - Faites glisser la vidéo sur la fenêtre ou choisissez **Fichier → Ouvrir une vidéo…** (⌘O).
@@ -48,6 +50,8 @@ MarkTheRoughcut est un lecteur simple pour visionner un montage. Vous regardez l
 - Les marqueurs hors du timecode de la vidéo sont ignorés ; MarkTheRoughcut vous indique combien.
 
 ## Réglages
+
+![Réglages : apparence, langue, mises à jour](settings.png)
 
 - **MarkTheRoughcut → Réglages…** (⌘,) : apparence claire ou sombre et langue (English, Deutsch, Français, Español). Changer de langue redémarre l’app ; vos marqueurs sont enregistrés.
 - **Mises à jour :** MarkTheRoughcut recherche lui-même les nouvelles versions sur GitHub et affiche un avis en haut de la fenêtre – **Installer la mise à jour** remplace l’app et la redémarre. Dans les Réglages, vous pouvez aussi cliquer sur **Rechercher des mises à jour**.

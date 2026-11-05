@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// The manual (Help menu): `Resources/help/<language>.md`, shown with a small Markdown renderer
-/// (headings, paragraphs, bullet lists, inline bold/code).
+/// (headings, paragraphs, bullet lists, inline bold/code, screenshots from `help/images/<language>/`).
 struct ManualView: View {
     @ObservedObject private var settings = AppSettings.shared
     /// Text to show instead of the bundled manual (tests).
@@ -24,6 +24,11 @@ struct ManualView: View {
                         }
                     case .paragraph(let s):
                         Text(inline(s)).font(.mono(12)).foregroundColor(t.muted).lineSpacing(3).fixedSize(horizontal: false, vertical: true)
+                    case .image(let file):
+                        if let img = picture(file) {
+                            // 2x screenshots: shown at their point size, never wider than the text
+                            Image(nsImage: img).resizable().aspectRatio(contentMode: .fit).frame(maxWidth: img.size.width).padding(.vertical, 6)
+                        }
                     }
                 }
             }
@@ -35,7 +40,15 @@ struct ManualView: View {
         .environment(\.colorScheme, settings.dark ? .dark : .light)
     }
 
-    enum Block { case title(String), heading(String), bullet(String), paragraph(String) }
+    enum Block: Equatable { case title(String), heading(String), bullet(String), paragraph(String), image(String) }
+
+    /// A screenshot in the manual's language, else the English one.
+    private func picture(_ file: String) -> NSImage? {
+        for lang in [settings.language, "en"] {
+            if let url = Bundle.main.url(forResource: file, withExtension: nil, subdirectory: "help/images/\(lang)"), let img = NSImage(contentsOf: url) { return img }
+        }
+        return nil
+    }
 
     private var blocks: [Block] {
         if let text { return ManualView.parse(text) }
@@ -55,6 +68,9 @@ struct ManualView: View {
             else if line.hasPrefix("## ") { flush(); out.append(.heading(String(line.dropFirst(3)))) }
             else if line.hasPrefix("# ") { flush(); out.append(.title(String(line.dropFirst(2)))) }
             else if line.hasPrefix("- ") { flush(); out.append(.bullet(String(line.dropFirst(2)))) }
+            else if line.hasPrefix("!["), let open = line.lastIndex(of: "("), line.hasSuffix(")") {
+                flush(); out.append(.image(String(line[line.index(after: open)..<line.index(before: line.endIndex)])))
+            }
             else { para.append(line) }
         }
         flush()
