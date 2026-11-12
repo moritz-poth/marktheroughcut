@@ -1,4 +1,8 @@
-# MarkTheRoughcut
+<h1 align="center"><img src="assets/icon.png" width="72" align="absmiddle" alt="">&nbsp;&nbsp;MARKTHEROUGHCUT</h1>
+
+<p align="center"><code>Mac app</code>&nbsp;&nbsp;<code>macOS 13+</code>&nbsp;&nbsp;<code>free · GPL-3.0</code></p>
+
+<p align="center">☕ If you use MarkTheRoughcut and like it, I would be glad if you <a href="https://buymeacoffee.com/moritzpoth">bought me a coffee</a>.</p>
 
 A simple Mac player for directors: watch a rough cut, set markers with comments and send them to the editor as a marker list for **Avid Media Composer**.
 
