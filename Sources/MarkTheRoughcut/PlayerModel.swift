@@ -57,6 +57,7 @@ final class PlayerModel: ObservableObject {
         let asset = AVURLAsset(url: url, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
         do {
             guard try await asset.load(.isPlayable) else {
+                Log.write("open \(url.path): not playable")
                 notice = String(localized: "This file cannot be played. MarkTheRoughcut plays what QuickTime Player plays (e.g. MOV and MP4 with H.264, HEVC or ProRes).")
                 return
             }
@@ -65,8 +66,9 @@ final class PlayerModel: ObservableObject {
             self.url = url
             self.info = info
             index = 0
-            notice = info.hasTimecode ? nil : String(localized: "This file has no timecode. Markers start at 00:00:00:00 – they will only line up in Avid if the clip there starts at 00:00:00:00 too.")
+            notice = info.hasTimecode ? nil : String(localized: "This file has no timecode. Markers start at 00:00:00:00 – they will only line up in Media Composer if the clip there starts at 00:00:00:00 too.")
             loadMarkers(for: url)
+            Log.write("open \(url.path): \(info.format.fps) fps, start \(info.format.string(info.startFrame))\(info.hasTimecode ? "" : " (no timecode)"), \(markers.count) markers from \(storeURL?.path ?? "-")")
             makeThumbnails(asset, info)
             waveform = nil
             Task { [weak self] in
@@ -75,6 +77,7 @@ final class PlayerModel: ObservableObject {
                 if self?.url == url { self?.waveform = wave }
             }
         } catch {
+            Log.write("open \(url.path) failed: \(error.localizedDescription)")
             notice = String(localized: "The video could not be opened: \(error.localizedDescription)")
         }
     }
@@ -169,6 +172,7 @@ final class PlayerModel: ObservableObject {
     private func insert(_ m: Marker) {
         markers.append(m)
         markers.sort { $0.frame < $1.frame }
+        Log.write("marker added at \(info.map { $0.format.string(m.frame) } ?? "\(m.frame)")" + (m.duration > 1 ? ", \(m.duration) frames" : ""))
         selection = m.id
         editing = m.id
     }
@@ -196,6 +200,7 @@ final class PlayerModel: ObservableObject {
     }
 
     func delete(_ id: Marker.ID) {
+        if let m = markers.first(where: { $0.id == id }) { Log.write("marker deleted at \(info.map { $0.format.string(m.frame) } ?? "\(m.frame)")") }
         markers.removeAll { $0.id == id }
         if selection == id { selection = nil }
     }
@@ -230,7 +235,9 @@ final class PlayerModel: ObservableObject {
             if outside > 0 { parts.append(String(localized: "\(outside) lie outside this video’s timecode and were left out.")) }
             if result.skipped > 0 { parts.append(String(localized: "\(result.skipped) lines could not be read.")) }
             notice = parts.joined(separator: " ")
+            Log.write("import \(file.path): \(new.count) new, \(outside) outside, \(result.skipped) unreadable")
         } catch {
+            Log.write("import \(file.path) failed: \(error.localizedDescription)")
             notice = String(localized: "The marker list could not be read: \(error.localizedDescription)")
         }
     }
@@ -259,6 +266,7 @@ final class PlayerModel: ObservableObject {
             let data = try JSONEncoder.pretty.encode(SavedMarkers(video: url?.lastPathComponent ?? "", markers: markers))
             try data.write(to: storeURL, options: .atomic)
         } catch {
+            Log.write("saving markers to \(storeURL.path) failed: \(error.localizedDescription)")
             notice = String(localized: "The markers could not be saved: \(error.localizedDescription)")
         }
     }

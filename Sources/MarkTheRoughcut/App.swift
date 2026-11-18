@@ -25,15 +25,20 @@ struct MarkTheRoughcutApp: App {
                     delegate.model = model
                     Keys.install(model)
                     AppSettings.shared.apply()
+                    Log.start()
                     Updater.shared.start()
                 }
         }
         .commands {
             CommandGroup(replacing: .appInfo) {
-                Button("About MarkTheRoughcut") { openWindow(id: "about") }
+                Button("About MarkTheRoughcut") { SettingsWindow.shared.show(.about) }
+            }
+            CommandGroup(replacing: .appSettings) {
+                Button("Settings…") { SettingsWindow.shared.show() }.keyboardShortcut(",")
             }
             CommandGroup(replacing: .help) {
                 Button("MarkTheRoughcut Manual") { openWindow(id: "manual") }.keyboardShortcut("?")
+                Button("Show Log File") { Log.reveal() }
             }
             CommandGroup(replacing: .newItem) {
                 Button("Open Video…") { openVideo(model) }.keyboardShortcut("o")
@@ -47,11 +52,6 @@ struct MarkTheRoughcutApp: App {
                 Button("Change Name…") { model.needsName = true }
             }
         }
-
-        Settings { SettingsView() }
-
-        Window("About MarkTheRoughcut", id: "about") { AboutView() }
-            .windowResizability(.contentSize)
 
         Window("Manual", id: "manual") { ManualView() }
             .defaultSize(width: 640, height: 720)

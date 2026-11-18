@@ -8,7 +8,7 @@ MarkTheRoughcut ist ein einfacher Player zum Abnehmen eines Schnitts. Du schaust
 
 - Zieh das Video ins Fenster oder wähle **Ablage → Video öffnen…** (⌘O).
 - MarkTheRoughcut spielt alles, was der QuickTime Player spielt, z. B. MOV und MP4 mit H.264, HEVC oder ProRes.
-- Der Timecode kommt aus der Datei. Er lässt sich nicht ändern – so landet jeder Marker in Avid genau an der richtigen Stelle. Hat eine Datei keinen Timecode, beginnt sie bei 00:00:00:00, und ein Hinweis sagt es dir.
+- Der Timecode kommt aus der Datei. Er lässt sich nicht ändern – so landet jeder Marker in Media Composer genau an der richtigen Stelle. Hat eine Datei keinen Timecode, beginnt sie bei 00:00:00:00, und ein Hinweis sagt es dir.
 
 ## Durch das Video bewegen
 
@@ -32,7 +32,7 @@ MarkTheRoughcut ist ein einfacher Player zum Abnehmen eines Schnitts. Du schaust
 ## Marker
 
 - Drück **M**, um an der Abspielposition einen Marker zu setzen. Das Kommentarfeld öffnet sich sofort – einfach lostippen.
-- Beim ersten Mal fragt MarkTheRoughcut nach deinem Namen. Er steht in Avid bei jedem Marker, damit der Schnitt weiß, von wem er ist. Dein Name steht über der Markerliste; mit dem Stift änderst du ihn.
+- Beim ersten Mal fragt MarkTheRoughcut nach deinem Namen. Er steht in Media Composer bei jedem Marker, damit der Schnitt weiß, von wem er ist. Dein Name steht über der Markerliste; mit dem Stift änderst du ihn.
 - Ein Klick auf einen Marker in der Liste oder in der Timeline springt dorthin. Ein Klick auf den Kommentar bearbeitet ihn.
 - **Marker mit Dauer:** am Anfang **I**, am Ende **O** drücken, dann **M**. Der Marker reicht von In bis Out: ein Marker am Anfang und am Ende, verbunden durch eine dünne Linie. **G** löscht In und Out.
 - Ein Klick auf den farbigen Punkt wählt die Farbe. Neue Marker bekommen die zuletzt gewählte Farbe.
@@ -41,23 +41,29 @@ MarkTheRoughcut ist ein einfacher Player zum Abnehmen eines Schnitts. Du schaust
 ## Marker an den Schnitt schicken
 
 - Wähle **Marker → Avid-Marker exportieren…** (⌘E) und speichere die Liste.
-- In Avid öffnet der Schnitt das Marker-Fenster und wählt **Import Markers**.
-- Manche Zeichen lassen Avid den Import abbrechen (z. B. „/“), Umlaute kommen verstümmelt an, und Zeilenumbrüche zerteilen einen Marker. MarkTheRoughcut ersetzt sie beim Export – aus ä wird ae, aus „/“ wird „ - “, Anführungszeichen werden zu ', Zeilenumbrüche zu Leerzeichen –, damit jeder Marker vollständig ankommt.
+- In Media Composer öffnet der Schnitt das Marker-Fenster und wählt **Import Markers**.
+- Manche Zeichen lassen Media Composer den Import abbrechen (z. B. „/“), Umlaute kommen verstümmelt an, und Zeilenumbrüche zerteilen einen Marker. MarkTheRoughcut ersetzt sie beim Export – aus ä wird ae, aus „/“ wird „ - “, Anführungszeichen werden zu ', Zeilenumbrüche zu Leerzeichen –, damit jeder Marker vollständig ankommt.
 
 ## Marker vom Schnitt bekommen
 
-- Wähle **Marker → Avid-Marker importieren…** (⇧⌘I) und eine aus Avid exportierte Liste (Marker-Fenster → Export Markers).
+- Wähle **Marker → Avid-Marker importieren…** (⇧⌘I) und eine aus Media Composer exportierte Liste (Marker-Fenster → Export Markers).
 - Marker außerhalb des Video-Timecodes werden ausgelassen; MarkTheRoughcut sagt dir, wie viele.
 
 ## Einstellungen
 
-![Einstellungen: Aussehen, Sprache, Updates](settings.png)
+![Einstellungen: Aussehen und Sprache](settings.png)
 
-- **MarkTheRoughcut → Einstellungen…** (⌘,): helles oder dunkles Erscheinungsbild und die Sprache (English, Deutsch, Français, Español). Beim Sprachwechsel startet die App neu; deine Marker sind gespeichert.
-- **Updates:** MarkTheRoughcut sucht selbst auf GitHub nach neuen Versionen und zeigt oben im Fenster einen Hinweis – **Update installieren** ersetzt die App und startet sie neu. In den Einstellungen kannst du auch auf **Nach Updates suchen** klicken.
+**MarkTheRoughcut → Einstellungen…** (⌘,) öffnet das Einstellungsfenster mit vier Reitern:
+
+- **Allgemein:** helles oder dunkles Erscheinungsbild und die Sprache (English, Deutsch, Français, Español). Beim Sprachwechsel startet die App neu; deine Marker sind gespeichert.
+- **Updates:** MarkTheRoughcut sucht selbst auf GitHub nach neuen Versionen und zeigt oben im Fenster einen Hinweis – **Update installieren** ersetzt die App und startet sie neu. **Nach Updates suchen** prüft sofort. Installiert werden nur Updates, die vom Entwickler signiert sind. **Testversionen erhalten** bietet auch Versionen an, die noch getestet werden (für Tester).
+- **Support:** **Selbsttest…** prüft Abspielen, Timecode, Marker und die Markerliste an einem eigenen kurzen Testvideo und schickt uns einen anonymen Bericht – deine Videos und Marker werden nicht angefasst. **Melden…** schickt uns ein Problem oder eine Idee, ohne GitHub-Konto. **Logdatei zeigen** zeigt das Log im Finder.
+- **Über:** Version, Lizenz und Quellcode – auch über **MarkTheRoughcut → Über MarkTheRoughcut**.
+
+**Hilfe → Logdatei zeigen** zeigt das Log ebenfalls im Finder, damit du es bei einem Problem mitschicken kannst.
 
 ## Probleme
 
 - **„Apple konnte nicht überprüfen …“ beim ersten Start:** Öffne Systemeinstellungen → Datenschutz & Sicherheit und klicke auf **Trotzdem öffnen** (nur einmal).
 - **Die Datei spielt nicht:** MarkTheRoughcut spielt, was der QuickTime Player spielt. Bitte um einen Export als MOV oder MP4 (H.264 oder ProRes).
-- **Die Marker sitzen in Avid an der falschen Stelle:** Das Video in Avid muss denselben Timecode haben wie die Datei, die du angeschaut hast – frag nach, ob mit Quell-Timecode exportiert wurde.
+- **Die Marker sitzen in Media Composer an der falschen Stelle:** Das Video in Media Composer muss denselben Timecode haben wie die Datei, die du angeschaut hast – frag nach, ob mit Quell-Timecode exportiert wurde.

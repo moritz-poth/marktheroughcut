@@ -79,6 +79,8 @@ struct MarkerRow: View {
                 // button style keeps the drawn dot (the borderless style drops custom shapes)
                 .menuStyle(.button).buttonStyle(.plain).menuIndicator(.hidden).fixedSize()
                 .help(Text("Colour"))
+                .accessibilityLabel(Text("Colour"))
+                .accessibilityValue(Text(marker.color.label))
                 Text(model.info.map { $0.format.string(marker.frame) } ?? "").font(.mono(12, semibold: true)).foregroundColor(theme.text)
                 if marker.duration > 1 {
                     Text("+\(marker.duration)f").font(.mono(10)).foregroundColor(theme.faint)

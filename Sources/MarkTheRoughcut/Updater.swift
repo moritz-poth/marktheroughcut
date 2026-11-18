@@ -1,4 +1,5 @@
 import AppKit
+import CryptoKit
 import Foundation
 import SwiftUI
 
@@ -11,7 +12,8 @@ struct AppVersion: Comparable, Equatable {
         var s = text.trimmingCharacters(in: .whitespaces)
         if s.hasPrefix("v") { s.removeFirst() }
         let parts = s.split(separator: "-", maxSplits: 1)
-        let nums = parts[0].split(separator: ".").map { Int($0) }
+        guard let first = parts.first else { return nil }   // "" or "v"
+        let nums = first.split(separator: ".").map { Int($0) }
         guard !nums.isEmpty, !nums.contains(nil) else { return nil }
         numbers = nums.map { $0! }
         if parts.count == 2 {
@@ -41,18 +43,32 @@ struct Release {
     let tag: String
     let page: URL
     let zip: URL
+    /// `<zip>.sig`: Ed25519 signature of the zip (scripts/update-key.swift)
+    let signature: URL?
+    /// Asset `MarkTheRoughcut-<version>.manual`: install by hand (e.g. after the update key was lost).
+    /// Only this marker comes from outside – the text and the link are fixed in the app, nothing is downloaded or run.
+    let manual: Bool
+
+    static let releasesPage = URL(string: "https://github.com/moritz-poth/marktheroughcut/releases")!
+
+    /// Release page, but only on this project's GitHub – otherwise the list of releases.
+    var safePage: URL { page.absoluteString.hasPrefix(Release.releasesPage.absoluteString + "/") ? page : Release.releasesPage }
 }
 
-/// Newest non-draft release with a MarkTheRoughcut zip, from GitHub's releases JSON.
-func newestRelease(fromJSON data: Data) -> Release? {
+/// Newest non-draft release with a MarkTheRoughcut zip (and its signature), from GitHub's releases JSON.
+/// Prereleases (test versions) only with `includePrereleases` – setting "Get test versions", or when a test version runs.
+func newestRelease(fromJSON data: Data, requireSignature: Bool = true, includePrereleases: Bool = false) -> Release? {
     struct Asset: Decodable { let name: String; let browser_download_url: URL }
-    struct R: Decodable { let tag_name: String; let html_url: URL; let draft: Bool; let assets: [Asset] }
+    struct R: Decodable { let tag_name: String; let html_url: URL; let draft: Bool; let prerelease: Bool?; let assets: [Asset] }
     guard let list = try? JSONDecoder().decode([R].self, from: data) else { return nil }
     return list
-        .filter { !$0.draft && AppVersion($0.tag_name) != nil }
+        .filter { !$0.draft && AppVersion($0.tag_name) != nil && (includePrereleases || $0.prerelease != true) }
         .compactMap { r -> (AppVersion, Release)? in
             guard let zip = r.assets.first(where: { $0.name.hasPrefix("MarkTheRoughcut-") && $0.name.hasSuffix(".zip") }) else { return nil }
-            return (AppVersion(r.tag_name)!, Release(tag: r.tag_name, page: r.html_url, zip: zip.browser_download_url))
+            let sig = r.assets.first { $0.name == zip.name + ".sig" }?.browser_download_url
+            let manual = r.assets.contains { $0.name == zip.name.dropLast(4) + ".manual" }
+            if requireSignature && sig == nil && !manual { return nil }
+            return (AppVersion(r.tag_name)!, Release(tag: r.tag_name, page: r.html_url, zip: zip.browser_download_url, signature: sig, manual: manual))
         }
         .max { $0.0 < $1.0 }?.1
 }
@@ -70,6 +86,13 @@ final class Updater: ObservableObject {
     @Published var state = State.idle
 
     static let current = Bundle.main.object(forInfoDictionaryKey: "MarkTheRoughcutRelease") as? String ?? "dev"
+    /// Public half of "MarkTheRoughcut update key" (`swift scripts/update-key.swift public`). Only zips signed with it are
+    /// installed: the codesign check alone proves the app is intact, not who made it (ad-hoc signature). Never replace it.
+    nonisolated static let publicKey = "XjoW5WOyLJYJslG2Sum6SKMWsbo0CuB3EoxqvWs8LcU="
+    /// Setting "Get test versions" (Settings → Updates); a running test version always looks for newer test versions.
+    @Published var betas = UserDefaults.standard.bool(forKey: "betas") {
+        didSet { UserDefaults.standard.set(betas, forKey: "betas"); check(manual: false) }
+    }
     private static let api = URL(string: "https://api.github.com/repos/moritz-poth/marktheroughcut/releases?per_page=20")!
     private var timer: Timer?
 
@@ -86,18 +109,22 @@ final class Updater: ObservableObject {
         if manual { state = .checking }
         var request = URLRequest(url: Self.api)
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        let betas = betas || AppVersion(Self.current)?.beta != nil
+        Self.session.dataTask(with: request) { data, response, error in
             let ok = (response as? HTTPURLResponse)?.statusCode == 200
-            let release = ok ? data.flatMap(newestRelease(fromJSON:)) : nil
+            let release = ok ? data.flatMap { newestRelease(fromJSON: $0, includePrereleases: betas) } : nil
             Task { @MainActor in
                 guard self.state != .installing else { return }
                 if let release, let new = AppVersion(release.tag), let mine = AppVersion(Self.current), mine < new {
+                    if self.available?.tag != release.tag { Log.write("update available: \(release.tag)" + (release.manual ? " (install by hand)" : "")) }
                     self.available = release
-                    if manual { self.state = .idle }
+                    // also clears "up to date" from an earlier check (test versions switched on afterwards)
+                    if manual || self.state == .upToDate { self.state = .idle }
                 } else if release != nil {
                     self.available = nil
                     if manual { self.state = .upToDate }
                 } else if manual {
+                    Log.write("update check failed: \(error?.localizedDescription ?? "HTTP \((response as? HTTPURLResponse)?.statusCode ?? 0)")")
                     self.state = .failed(String(localized: "Could not check for updates. Check the internet connection and try again."))
                 }
             }
@@ -107,24 +134,48 @@ final class Updater: ObservableObject {
     /// Downloads the zip, verifies the app inside, swaps it in place of the running app and restarts.
     /// The old version goes to the Trash. Markers are saved on every change, so nothing is lost.
     func install() {
-        guard let release = available, state != .installing else { return }
+        guard let release = available, !release.manual, let sigURL = release.signature, state != .installing else { return }
         state = .installing
-        URLSession.shared.downloadTask(with: release.zip) { file, response, error in
-            let result: Result<URL, Error>
-            if let file, (response as? HTTPURLResponse)?.statusCode == 200 {
-                result = Result { try Self.unpack(file, expecting: release.tag) }
-            } else {
-                result = .failure(UpdateError(String(localized: "The update could not be downloaded. Check the internet connection and try again.")))
-            }
-            Task { @MainActor in
-                switch result {
-                case .success(let app):
-                    do { try self.swapAndRestart(with: app) } catch { self.state = .failed(error.localizedDescription) }
-                case .failure(let error):
-                    self.state = .failed(error.localizedDescription)
+        Log.write("installing update \(release.tag)")
+        Task {
+            let signature = try? await Self.session.data(from: sigURL).0
+            Self.session.downloadTask(with: release.zip) { file, response, error in
+                let result: Result<URL, Error>
+                if let file, (response as? HTTPURLResponse)?.statusCode == 200 {
+                    result = Result { try Self.unpack(file, expecting: release.tag, signature: signature) }
+                } else {
+                    result = .failure(UpdateError(String(localized: "The update could not be downloaded. Check the internet connection and try again.")))
                 }
-            }
-        }.resume()
+                Task { @MainActor in
+                    switch result {
+                    case .success(let app):
+                        do { try self.swapAndRestart(with: app) } catch {
+                            Log.write("update failed: \(error.localizedDescription)")
+                            self.state = .failed(error.localizedDescription)
+                        }
+                    case .failure(let error):
+                        Log.write("update failed: \(error.localizedDescription)")
+                        self.state = .failed(error.localizedDescription)
+                    }
+                }
+            }.resume()
+        }
+    }
+
+    /// A hanging download (slow GitHub CDN) ends after 2 minutes with a message instead of waiting forever.
+    nonisolated private static let session: URLSession = {
+        let c = URLSessionConfiguration.default
+        c.timeoutIntervalForRequest = 30
+        c.timeoutIntervalForResource = 120
+        return URLSession(configuration: c)
+    }()
+
+    /// The zip was signed with the update key (checked before anything in it is unpacked or run).
+    nonisolated static func signatureValid(_ zip: Data, _ signature: Data?, publicKey: String = Updater.publicKey) -> Bool {
+        guard let signature, let sig = Data(base64Encoded: String(decoding: signature, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)),
+              let raw = Data(base64Encoded: publicKey), let key = try? Curve25519.Signing.PublicKey(rawRepresentation: raw)
+        else { return false }
+        return key.isValidSignature(sig, for: zip)
     }
 
     struct UpdateError: LocalizedError {
@@ -134,10 +185,12 @@ final class Updater: ObservableObject {
     }
 
     /// Unzips into a temporary folder and checks that it really is the expected, intact MarkTheRoughcut version.
-    nonisolated static func unpack(_ zip: URL, expecting tag: String, bundleID: String? = Bundle.main.bundleIdentifier) throws -> URL {
+    nonisolated static func unpack(_ zip: URL, expecting tag: String, signature: Data?, publicKey: String = Updater.publicKey,
+                                   bundleID: String? = Bundle.main.bundleIdentifier) throws -> URL {
+        let damaged = UpdateError(String(localized: "The downloaded update is damaged. Please try again later or download it from GitHub."))
+        guard let data = try? Data(contentsOf: zip, options: .mappedIfSafe), signatureValid(data, signature, publicKey: publicKey) else { throw damaged }
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("marktheroughcut-update-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        let damaged = UpdateError(String(localized: "The downloaded update is damaged. Please try again later or download it from GitHub."))
         guard run("/usr/bin/ditto", ["-x", "-k", zip.path, dir.path]) else { throw damaged }
         let app = dir.appendingPathComponent("MarkTheRoughcut.app")
         guard let info = Bundle(url: app)?.infoDictionary,
@@ -173,6 +226,8 @@ final class Updater: ObservableObject {
             state = .failed(String(localized: "The update is installed. Quit MarkTheRoughcut and open it again to finish."))
             return
         }
+        Log.write("update in place, restarting")
+        Log.flush()
         NSApp.terminate(nil)
     }
 
@@ -206,7 +261,10 @@ struct UpdateBanner: View {
                     if case .failed(let message) = updater.state {
                         Text(message).font(.mono(11)).foregroundColor(t.warning).fixedSize(horizontal: false, vertical: true)
                     } else {
-                        Text("Installing restarts MarkTheRoughcut. Your markers are saved.").font(.mono(11)).foregroundColor(t.muted)
+                        Text(release.manual
+                             ? "This update has to be installed by hand: download it from GitHub, quit MarkTheRoughcut and replace the app in the Applications folder."
+                             : "Installing restarts MarkTheRoughcut. Your markers are saved.")
+                            .font(.mono(11)).foregroundColor(t.muted).fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 Spacer(minLength: 0)
@@ -214,14 +272,19 @@ struct UpdateBanner: View {
                     ProgressView().controlSize(.small)
                     Text("Installing update…").font(.mono(11)).foregroundColor(t.muted)
                 } else {
-                    Button("What’s new") { NSWorkspace.shared.open(release.page) }.buttonStyle(FerryButtonStyle(theme: t))
-                    Button("Install update") { updater.install() }.buttonStyle(FerryButtonStyle(theme: t, primary: true))
+                    if release.manual {
+                        Button("Download from GitHub") { NSWorkspace.shared.open(release.safePage) }.buttonStyle(FerryButtonStyle(theme: t, primary: true))
+                    } else {
+                        Button("What’s new") { NSWorkspace.shared.open(release.safePage) }.buttonStyle(FerryButtonStyle(theme: t))
+                        Button("Install update") { updater.install() }.buttonStyle(FerryButtonStyle(theme: t, primary: true))
+                    }
                     Button { hidden = true } label: {
                         Image(systemName: "xmark").font(.system(size: 10, weight: .semibold)).foregroundColor(t.muted)
                             .frame(width: 18, height: 18).contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(Text("Close"))
+                    .help(Text("Close"))
                 }
             }
             .padding(.horizontal, 16).padding(.vertical, 8)

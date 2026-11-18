@@ -12,12 +12,14 @@ struct Theme {
     var panel: Color { c(0x181a1c, 0xebebe8) }
     var text: Color { c(0xeceded, 0x17191b) }
     var muted: Color { c(0xa9adb1, 0x3f444a) }
-    var faint: Color { c(0x7c8288, 0x60666c) }
+    var faint: Color { c(0x858b91, 0x60666c) }   // dark 4.6:1 (WCAG AA)
     var line: Color { c(0x3a3f44, 0xc4c8cc) }
     var primary: Color { c(0xe6e7e8, 0x2e3236) }
     var onPrimary: Color { c(0x1f2225, 0xf5f5f3) }
     var playhead: Color { c(0x226e8e, 0x226e8e) } // Avid-like blue (the user's reference)
-    var warning: Color { c(0xf0883e, 0xe16f24) }
+    var warning: Color { c(0xf0883e, 0xb4530f) }   // light 4.6:1 – also text
+    var online: Color { c(0x3fb950, 0x1a7f37) }    // light 4.9:1, also text (self-test, toast)
+    var error: Color { c(0xf85149, 0xc62828) }
     /// Selected marker row; the comment box (lighter surface, darker outline) stays clearly lighter than it.
     var selection: Color { c(0x24282c, 0xdfe2e5) }
     var field: Color { c(0x30353a, 0xffffff) }
@@ -120,6 +122,102 @@ struct Switch: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(on ? .isSelected : [])
+        .accessibilityValue(on ? Text("On") : Text("Off"))
+    }
+}
+
+/// On/off row: label left, `Switch` right; the whole row toggles (as in Mountpoint).
+struct SwitchRow: View {
+    let title: LocalizedStringKey
+    let on: Bool
+    let theme: Theme
+    let action: () -> Void
+    var body: some View {
+        HStack(spacing: 10) {
+            Text(title).font(.mono()).foregroundColor(theme.text).fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 8)
+            Switch(on: on, theme: theme, action: action)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture(perform: action)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(title))
+        .accessibilityValue(on ? Text("On") : Text("Off"))
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction { action() }
+    }
+}
+
+/// × button with accessibility label and tooltip.
+struct CloseButton: View {
+    let label: Text
+    let theme: Theme
+    let action: () -> Void
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "xmark").font(.system(size: 10, weight: .semibold)).foregroundColor(theme.muted)
+                .frame(width: 18, height: 18).contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
+        .help(label)
+    }
+}
+
+struct SectionTitle: View {
+    let title: LocalizedStringKey
+    let theme: Theme
+    var body: some View {
+        Text(title)
+            .textCase(.uppercase)
+            .font(.mono(11, semibold: true))
+            .tracking(1)
+            .foregroundColor(theme.muted)
+            .lineLimit(1)
+            .truncationMode(.middle)
+    }
+}
+
+/// Scroll bar as in Mountpoint and MediaFiles Check: 6 pt, rounded, always visible while there is something to scroll.
+final class ThinScroller: NSScroller {
+    var dark = true { didSet { needsDisplay = true } }
+    override class var isCompatibleWithOverlayScrollers: Bool { false }
+    override class func scrollerWidth(for controlSize: NSControl.ControlSize, scrollerStyle: NSScroller.Style) -> CGFloat { 10 }
+    override func draw(_ dirtyRect: NSRect) { drawKnob() }
+    override func drawKnob() {
+        let knob = rect(for: .knob)
+        guard knob.height > 0 else { return }
+        let thumb = NSRect(x: bounds.maxX - 8, y: knob.minY + 2, width: 6, height: max(knob.height - 4, 20))
+        (dark ? NSColor.white : NSColor.black).withAlphaComponent(0.35).setFill()
+        NSBezierPath(roundedRect: thumb, xRadius: 3, yRadius: 3).fill()
+    }
+}
+
+extension View {
+    /// gives the nearest NSScrollView (ScrollView, TextEditor) the `ThinScroller`
+    /// shortcut: takes the first NSScrollView among the ancestors – only where there is exactly one (self-test, report form)
+    func thinScroller(dark: Bool) -> some View { background(ThinScrollerHook(dark: dark)) }
+}
+
+private struct ThinScrollerHook: NSViewRepresentable {
+    let dark: Bool
+    func makeNSView(context: Context) -> NSView { NSView() }
+    func updateNSView(_ view: NSView, context: Context) {
+        DispatchQueue.main.async {
+            var ancestor = view.superview
+            while let a = ancestor, Self.find(in: a) == nil { ancestor = a.superview }
+            guard let s = ancestor.flatMap(Self.find) else { return }
+            if !(s.verticalScroller is ThinScroller) { s.verticalScroller = ThinScroller() }
+            (s.verticalScroller as? ThinScroller)?.dark = dark
+            s.scrollerStyle = .legacy
+            s.hasVerticalScroller = true
+            s.autohidesScrollers = true
+        }
+    }
+    private static func find(in view: NSView) -> NSScrollView? {
+        if let s = view as? NSScrollView { return s }
+        for sub in view.subviews { if let s = find(in: sub) { return s } }
+        return nil
     }
 }
 

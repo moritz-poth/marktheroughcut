@@ -8,7 +8,7 @@ MarkTheRoughcut es un reproductor sencillo para revisar un montaje. Ves el víde
 
 - Arrastra el vídeo a la ventana o elige **Archivo → Abrir vídeo…** (⌘O).
 - MarkTheRoughcut reproduce todo lo que reproduce QuickTime Player, p. ej. MOV y MP4 con H.264, HEVC o ProRes.
-- El timecode se toma del archivo. No se puede cambiar – así cada marcador cae exactamente en su sitio en Avid. Si un archivo no tiene timecode, empieza en 00:00:00:00 y un aviso te lo indica.
+- El timecode se toma del archivo. No se puede cambiar – así cada marcador cae exactamente en su sitio en Media Composer. Si un archivo no tiene timecode, empieza en 00:00:00:00 y un aviso te lo indica.
 
 ## Moverse por el vídeo
 
@@ -32,7 +32,7 @@ MarkTheRoughcut es un reproductor sencillo para revisar un montaje. Ves el víde
 ## Marcadores
 
 - Pulsa **M** para poner un marcador en el cabezal. El campo de comentario se abre al momento – solo tienes que escribir.
-- La primera vez, MarkTheRoughcut te pide tu nombre. Aparece con cada marcador en Avid, para que el montador sepa quién lo escribió. Tu nombre se muestra encima de la lista; haz clic en el lápiz para cambiarlo.
+- La primera vez, MarkTheRoughcut te pide tu nombre. Aparece con cada marcador en Media Composer, para que el montador sepa quién lo escribió. Tu nombre se muestra encima de la lista; haz clic en el lápiz para cambiarlo.
 - Haz clic en un marcador de la lista o de la línea de tiempo para saltar a él. Haz clic en su comentario para editarlo.
 - **Marcador con duración:** pulsa **I** al principio y **O** al final, después **M**. El marcador va de la entrada a la salida: un marcador al principio y otro al final, unidos por una línea fina. **G** borra la entrada y la salida.
 - Haz clic en el punto de color para elegir un color. Los marcadores nuevos llevan el último color elegido.
@@ -41,23 +41,29 @@ MarkTheRoughcut es un reproductor sencillo para revisar un montaje. Ves el víde
 ## Enviar los marcadores al montador
 
 - Elige **Marcadores → Exportar marcadores de Avid…** (⌘E) y guarda la lista.
-- En Avid, el montador abre la ventana Markers y elige **Import Markers**.
-- Algunos caracteres hacen que Avid deje de importar (por ejemplo «/»), las tildes llegan deformadas y los saltos de línea parten un marcador. MarkTheRoughcut los sustituye al exportar – á pasa a ser a, ñ pasa a ser n, «/» pasa a ser « - », las comillas pasan a ser ', los saltos de línea espacios – para que cada marcador llegue completo.
+- En Media Composer, el montador abre la ventana Markers y elige **Import Markers**.
+- Algunos caracteres hacen que Media Composer deje de importar (por ejemplo «/»), las tildes llegan deformadas y los saltos de línea parten un marcador. MarkTheRoughcut los sustituye al exportar – á pasa a ser a, ñ pasa a ser n, «/» pasa a ser « - », las comillas pasan a ser ', los saltos de línea espacios – para que cada marcador llegue completo.
 
 ## Recibir marcadores del montador
 
-- Elige **Marcadores → Importar marcadores de Avid…** (⇧⌘I) y una lista exportada desde Avid (ventana Markers → Export Markers).
+- Elige **Marcadores → Importar marcadores de Avid…** (⇧⌘I) y una lista exportada desde Media Composer (ventana Markers → Export Markers).
 - Los marcadores fuera del timecode del vídeo se omiten; MarkTheRoughcut te dice cuántos.
 
 ## Ajustes
 
-![Ajustes: aspecto, idioma, actualizaciones](settings.png)
+![Ajustes: aspecto e idioma](settings.png)
 
-- **MarkTheRoughcut → Ajustes…** (⌘,): aspecto claro u oscuro y el idioma (English, Deutsch, Français, Español). Al cambiar el idioma, la app se reinicia; tus marcadores están guardados.
-- **Actualizaciones:** MarkTheRoughcut busca por sí mismo nuevas versiones en GitHub y muestra un aviso arriba en la ventana – **Instalar actualización** reemplaza la app y la reinicia. En Ajustes también puedes hacer clic en **Buscar actualizaciones**.
+**MarkTheRoughcut → Ajustes…** (⌘,) abre la ventana de ajustes con cuatro pestañas:
+
+- **General:** aspecto claro u oscuro y el idioma (English, Deutsch, Français, Español). Al cambiar el idioma la app se reinicia; tus marcadores están guardados.
+- **Actualizaciones:** MarkTheRoughcut busca por sí mismo nuevas versiones en GitHub y muestra un aviso arriba en la ventana – **Instalar actualización** sustituye la app y la reinicia. **Buscar actualizaciones** comprueba enseguida. Solo se instalan actualizaciones firmadas por el desarrollador. **Recibir versiones de prueba** ofrece también versiones aún en prueba (para testers).
+- **Soporte:** **Autoprueba…** comprueba la reproducción, el timecode, los marcadores y la lista de marcadores con su propio vídeo de prueba corto y nos envía un informe anónimo – tus vídeos y marcadores no se tocan. **Informar…** nos envía un problema o una idea, sin cuenta de GitHub. **Ver registro** muestra el registro en el Finder.
+- **Acerca de:** versión, licencia y código fuente – también en **MarkTheRoughcut → Acerca de MarkTheRoughcut**.
+
+**Ayuda → Ver registro** también muestra el registro en el Finder, para que puedas enviarlo con un problema.
 
 ## Problemas
 
 - **«Apple no ha podido verificar …» al abrirla por primera vez:** abre Ajustes del Sistema → Privacidad y seguridad y haz clic en **Abrir igualmente** (solo una vez).
 - **El archivo no se reproduce:** MarkTheRoughcut reproduce lo que reproduce QuickTime Player. Pide una exportación en MOV o MP4 (H.264 o ProRes).
-- **Los marcadores caen en el sitio equivocado en Avid:** el vídeo en Avid debe tener el mismo timecode que el archivo revisado – comprueba que se exportó con el timecode de origen.
+- **Los marcadores caen en el sitio equivocado en Media Composer:** el vídeo en Media Composer debe tener el mismo timecode que el archivo revisado – comprueba que se exportó con el timecode de origen.

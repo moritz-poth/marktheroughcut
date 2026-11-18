@@ -24,4 +24,21 @@ struct LocalizationTests {
             #expect(FileManager.default.fileExists(atPath: root.appendingPathComponent("help/\(code).md").path), "manual \(code) missing")
         }
     }
+
+    /// Every fixed UI text in the app's sources has a German entry (texts with \(…) are checked by hand).
+    @Test func sourceTextsAreTranslated() throws {
+        let de = strings("de")
+        let sources = root.deletingLastPathComponent().appendingPathComponent("Sources/MarkTheRoughcut")
+        let pattern = try NSRegularExpression(pattern: #"(?:Text|Button|String\(localized:|LocalizedStringKey\(|title:|hint\(|SwitchRow\(title:)\s*\(?\s*"((?:[^"\\]|\\.)+)""#)
+        var missing: [String] = []
+        for file in try FileManager.default.contentsOfDirectory(atPath: sources.path) where file.hasSuffix(".swift") {
+            let text = try String(contentsOf: sources.appendingPathComponent(file), encoding: .utf8)
+            for m in pattern.matches(in: text, range: NSRange(text.startIndex..., in: text)) {
+                let key = String(text[Range(m.range(at: 1), in: text)!])
+                if key.contains("\\(") || key.allSatisfy({ !$0.isLetter }) { continue }
+                if de[key.replacingOccurrences(of: "\\\"", with: "\"")] == nil { missing.append("\(file): \(key)") }
+            }
+        }
+        #expect(missing.isEmpty, "not in de.lproj: \(missing)")
+    }
 }

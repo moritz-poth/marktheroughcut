@@ -15,16 +15,17 @@ A simple Mac player for directors: watch a rough cut, set markers with comments 
 ## Features
 
 - Plays everything QuickTime Player plays (MOV, MP4 with H.264, HEVC, ProRes …).
-- **Timecode from the file** – markers land exactly where they belong in Avid.
+- **Timecode from the file** – markers land exactly where they belong in Media Composer.
 - **Overview bar** with thumbnails, plus a **zoomable timeline** around the playhead (↑/↓) with Avid-style markers and the sound as a waveform.
 - Markers with colour and comment; saved automatically next to the video. Your name is shown above the marker list.
 - Light or dark appearance, built-in manual in four languages, volume control.
 
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/screenshots/settings-dark.png"><img src="assets/screenshots/settings-light.png" width="460" alt="Settings: appearance, language, updates"></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/screenshots/settings-dark.png"><img src="assets/screenshots/settings-light.png" width="560" alt="Settings: appearance and language"></picture></p>
 
-- **Updates itself:** checks GitHub for new versions and installs them with one click (Settings → Check for updates).
-- **Export** an Avid marker list (Markers window → Import Markers). Characters Avid stumbles over (umlauts, “/”, quotes, line breaks) are replaced, so every marker arrives complete.
-- **Import** a marker list exported from Avid – e.g. the editor's notes for the director.
+- **Updates itself:** checks GitHub for new versions and installs them with one click (Settings → Updates). Only updates signed by the developer are installed.
+- **Self-test and problem reports:** Settings → Support checks the app on a test video of its own and sends an anonymous report; a problem or idea can be sent without a GitHub account. Help → Show Log File.
+- **Export** a Media Composer marker list (Markers window → Import Markers). Characters Media Composer stumbles over (umlauts, “/”, quotes, line breaks) are replaced, so every marker arrives complete.
+- **Import** a marker list exported from Media Composer – e.g. the editor's notes for the director.
 
 ## Keys
 
@@ -42,17 +43,17 @@ A simple Mac player for directors: watch a rough cut, set markers with comments 
 | ⌫ | Delete the selected marker |
 | Esc / Enter | Leave the comment field (or click anywhere else) |
 
-The first marker asks for your name – it appears with every marker in Avid.
+The first marker asks for your name – it appears with every marker in Media Composer.
 
 ## Install
 
-Requires macOS 13 or later, Apple Silicon or Intel. Download `MarkTheRoughcut-<version>.zip` from [Releases](../../releases), unzip, move the app to Applications (so it can update itself). It is not signed with a paid Apple certificate: on first launch, open **System Settings → Privacy & Security** and click **Open Anyway** (once).
+Requires macOS 13 or later, Apple Silicon or Intel. Download `MarkTheRoughcut-<version>.dmg` from [Releases](../../releases), open it and drag the app onto Applications (so it can update itself). It is not signed with a paid Apple certificate: on first launch, open **System Settings → Privacy & Security** and click **Open Anyway** (once).
 
 ## Build
 
 ```
 swift test                 # VideoInfo tests need ffmpeg (Homebrew) to make test videos
-scripts/build-app.sh       # → dist/MarkTheRoughcut.app and a zip
+scripts/build-app.sh       # → dist/MarkTheRoughcut.app, zip + .sig (updater) and DMG
 ```
 
 `Sources/MarkerCore` – timecode, markers, Avid import/export, reading the file's timecode (tested). `Sources/MarkTheRoughcut` – the app.

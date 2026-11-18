@@ -103,8 +103,7 @@ struct ContentView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 11)).foregroundColor(t.warning)
                     Text(notice).font(.mono(11)).foregroundColor(t.text).lineLimit(2)
-                    Button { model.notice = nil } label: { Image(systemName: "xmark").font(.system(size: 9, weight: .semibold)).foregroundColor(t.faint) }
-                        .buttonStyle(.plain).accessibilityLabel(Text("Close"))
+                    CloseButton(label: Text("Close"), theme: t) { model.notice = nil }
                 }
             }
             if model.info != nil {
@@ -150,7 +149,7 @@ struct ContentView: View {
     private var nameSheet: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Your name").font(.mono(14, semibold: true)).foregroundColor(t.text)
-            Text("It appears with every marker in Avid, so the editor knows who wrote it.")
+            Text("It appears with every marker in Media Composer, so the editor knows who wrote it.")
                 .font(.mono(12)).foregroundColor(t.muted).fixedSize(horizontal: false, vertical: true)
             TextField("Name", text: $nameDraft).textFieldStyle(.roundedBorder).font(.mono(13))
                 .onSubmit(saveName)
@@ -194,7 +193,7 @@ func openVideo(_ model: PlayerModel) {
 func importMarkers(_ model: PlayerModel) {
     let panel = NSOpenPanel()
     panel.allowedContentTypes = [.plainText, .text]
-    panel.message = String(localized: "Choose a marker list exported from Avid (Markers window → Export Markers).")
+    panel.message = String(localized: "Choose a marker list exported from Media Composer (Markers window → Export Markers).")
     if panel.runModal() == .OK, let url = panel.url { model.importMarkers(from: url) }
 }
 
@@ -204,9 +203,13 @@ func exportMarkers(_ model: PlayerModel) {
     let panel = NSSavePanel()
     panel.allowedContentTypes = [.plainText]
     panel.nameFieldStringValue = "\(model.url?.deletingPathExtension().lastPathComponent ?? "Markers") Markers.txt"
-    panel.message = String(localized: "In Avid: Markers window → Import Markers.")
+    panel.message = String(localized: "In Media Composer: Markers window → Import Markers.")
     if panel.runModal() == .OK, let url = panel.url {
-        do { try data.write(to: url, options: .atomic) } catch {
+        do {
+            try data.write(to: url, options: .atomic)
+            Log.write("export \(url.path): \(model.markers.count) markers")
+        } catch {
+            Log.write("export \(url.path) failed: \(error.localizedDescription)")
             model.notice = String(localized: "The marker list could not be saved: \(error.localizedDescription)")
         }
     }
