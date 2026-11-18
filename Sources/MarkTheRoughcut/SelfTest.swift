@@ -361,24 +361,35 @@ func anonymize(_ text: String) -> String {
             t = (t as NSString).replacingCharacters(in: m.range, with: "\(scheme)://<server-\(h)>")
         }
     }
-    let keep: Set<String> = ["Library", "Logs", "MarkTheRoughcut", "Application Support", "Volumes", "Users", "Shared",
-                             "Macintosh HD", "Desktop", "Documents", "Downloads", "Movies", "tmp", "private", "var", "folders"]
-    guard let re = try? NSRegularExpression(pattern: #"(/Volumes/|~/|/Users/)([^\s,:"'|()]+(?: (?!→)[^\s,:"'|()]+)*)"#) else { return t }
+    // paths written with Log.path are marked ‹…›: hashed whole, whatever characters the names contain
+    return replacing(#"‹([^›]*)›"#, in: t) { hashPath($0) }
+}
+
+private let keepNames: Set<String> = ["Library", "Logs", "MarkTheRoughcut", "Application Support", "Volumes", "Users", "Shared",
+                                      "Macintosh HD", "Desktop", "Documents", "Downloads", "Movies", "tmp", "private", "var", "folders"]
+
+private func hashName(_ p: String) -> String {
+    if p.isEmpty || p == "~" || keepNames.contains(p) || p.hasPrefix("MarkTheRoughcut") || p.hasPrefix("<") { return p }
+    return "n" + SHA256.hash(data: Data(p.utf8)).prefix(3).map { String(format: "%02x", $0) }.joined()
+}
+
+private func hashPath(_ p: String) -> String { p.split(separator: "/", omittingEmptySubsequences: false).map { hashName(String($0)) }.joined(separator: "/") }
+
+/// Replaces every match of `pattern` with `transform(group 1)`; text between matches goes through `rest`.
+private func replacing(_ pattern: String, in t: String, rest: (String) -> String = unmarked, _ transform: (String) -> String) -> String {
+    guard let re = try? NSRegularExpression(pattern: pattern) else { return rest(t) }
     let ns = t as NSString
-    var out = ""
-    var last = 0
+    var out = "", last = 0
     for m in re.matches(in: t, range: NSRange(location: 0, length: ns.length)) {
-        out += ns.substring(with: NSRange(location: last, length: m.range.location - last))
-        out += ns.substring(with: m.range(at: 1))
-        let parts = ns.substring(with: m.range(at: 2)).split(separator: "/", omittingEmptySubsequences: false).map { part -> String in
-            let p = String(part)
-            if p.isEmpty || keep.contains(p) || p.hasPrefix("MarkTheRoughcut") || p.hasPrefix("<") { return p }
-            let h = SHA256.hash(data: Data(p.utf8)).prefix(3).map { String(format: "%02x", $0) }.joined()
-            return "n" + h
-        }
-        out += parts.joined(separator: "/")
+        out += rest(ns.substring(with: NSRange(location: last, length: m.range.location - last)))
+        out += transform(ns.substring(with: m.range(at: 1)))
         last = m.range.location + m.range.length
     }
-    out += ns.substring(from: last)
-    return out
+    return out + rest(ns.substring(from: last))
+}
+
+/// Text outside ‹…›: quoted names in error messages (“Cut v3.mov”) are hashed, then any path left unmarked.
+private func unmarked(_ t: String) -> String {
+    let quotes = replacing(#"“([^”]*)”"#, in: t, rest: { $0 }) { "“\(hashPath($0))”" }
+    return replacing(#"((?:/Volumes/|~/|/Users/)[^\s,:"'|()]+(?: (?!→)[^\s,:"'|()]+)*)"#, in: quotes, rest: { $0 }) { hashPath($0) }
 }

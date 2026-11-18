@@ -31,7 +31,7 @@ enum Reporter {
             }
         }
         switch save(report) {
-        case .saved(let path): Log.write("report saved (sending failed): \(path)"); return .failed(path)
+        case .saved(let path): Log.write("report saved (sending failed): \(Log.path(URL(fileURLWithPath: path)))"); return .failed(path)
         case let other: return other
         }
     }

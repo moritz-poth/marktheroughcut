@@ -29,4 +29,13 @@ struct SelfTestTests {
         #expect(a.hasPrefix("open ~/Movies/n"))
         #expect(a.hasSuffix(": 25 fps"))
     }
+
+    @Test func anonymizeHidesMarkedPathsAndQuotedNames() {
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        let url = URL(fileURLWithPath: "\(home)/Movies/Client: Film (Cut, v3)/Secret.mov")
+        let a = anonymize("open \(Log.path(url)) failed: The file “Secret.mov” couldn’t be opened.")
+        for word in ["Client", "Film", "Cut", "v3", "Secret", "‹", "›"] { #expect(!a.contains(word), "\(word) in \(a)") }
+        #expect(a.hasPrefix("open ~/Movies/n"))
+        #expect(a.contains(" failed: The file “n"))
+    }
 }

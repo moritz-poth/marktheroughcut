@@ -70,6 +70,9 @@ enum Log {
         }
     }
 
+    /// A path in a log line, marked so reports hash all of it (`anonymize`), whatever characters the names contain.
+    static func path(_ url: URL) -> String { "‹\(url.path)›" }
+
     static func reveal() {
         if !FileManager.default.fileExists(atPath: file.path) { write("log opened"); flush() }
         NSWorkspace.shared.activateFileViewerSelecting([file])

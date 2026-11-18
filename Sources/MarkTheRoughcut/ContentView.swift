@@ -207,9 +207,9 @@ func exportMarkers(_ model: PlayerModel) {
     if panel.runModal() == .OK, let url = panel.url {
         do {
             try data.write(to: url, options: .atomic)
-            Log.write("export \(url.path): \(model.markers.count) markers")
+            Log.write("export \(Log.path(url)): \(model.markers.count) markers")
         } catch {
-            Log.write("export \(url.path) failed: \(error.localizedDescription)")
+            Log.write("export \(Log.path(url)) failed: \(error.localizedDescription)")
             model.notice = String(localized: "The marker list could not be saved: \(error.localizedDescription)")
         }
     }

@@ -57,7 +57,7 @@ final class PlayerModel: ObservableObject {
         let asset = AVURLAsset(url: url, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
         do {
             guard try await asset.load(.isPlayable) else {
-                Log.write("open \(url.path): not playable")
+                Log.write("open \(Log.path(url)): not playable")
                 notice = String(localized: "This file cannot be played. MarkTheRoughcut plays what QuickTime Player plays (e.g. MOV and MP4 with H.264, HEVC or ProRes).")
                 return
             }
@@ -68,7 +68,7 @@ final class PlayerModel: ObservableObject {
             index = 0
             notice = info.hasTimecode ? nil : String(localized: "This file has no timecode. Markers start at 00:00:00:00 – they will only line up in Media Composer if the clip there starts at 00:00:00:00 too.")
             loadMarkers(for: url)
-            Log.write("open \(url.path): \(info.format.fps) fps, start \(info.format.string(info.startFrame))\(info.hasTimecode ? "" : " (no timecode)"), \(markers.count) markers from \(storeURL?.path ?? "-")")
+            Log.write("open \(Log.path(url)): \(info.format.fps) fps, start \(info.format.string(info.startFrame))\(info.hasTimecode ? "" : " (no timecode)"), \(markers.count) markers from \(storeURL?.path ?? "-")")
             makeThumbnails(asset, info)
             waveform = nil
             Task { [weak self] in
@@ -77,7 +77,7 @@ final class PlayerModel: ObservableObject {
                 if self?.url == url { self?.waveform = wave }
             }
         } catch {
-            Log.write("open \(url.path) failed: \(error.localizedDescription)")
+            Log.write("open \(Log.path(url)) failed: \(error.localizedDescription)")
             notice = String(localized: "The video could not be opened: \(error.localizedDescription)")
         }
     }
@@ -235,9 +235,9 @@ final class PlayerModel: ObservableObject {
             if outside > 0 { parts.append(String(localized: "\(outside) lie outside this video’s timecode and were left out.")) }
             if result.skipped > 0 { parts.append(String(localized: "\(result.skipped) lines could not be read.")) }
             notice = parts.joined(separator: " ")
-            Log.write("import \(file.path): \(new.count) new, \(outside) outside, \(result.skipped) unreadable")
+            Log.write("import \(Log.path(file)): \(new.count) new, \(outside) outside, \(result.skipped) unreadable")
         } catch {
-            Log.write("import \(file.path) failed: \(error.localizedDescription)")
+            Log.write("import \(Log.path(file)) failed: \(error.localizedDescription)")
             notice = String(localized: "The marker list could not be read: \(error.localizedDescription)")
         }
     }
@@ -266,7 +266,7 @@ final class PlayerModel: ObservableObject {
             let data = try JSONEncoder.pretty.encode(SavedMarkers(video: url?.lastPathComponent ?? "", markers: markers))
             try data.write(to: storeURL, options: .atomic)
         } catch {
-            Log.write("saving markers to \(storeURL.path) failed: \(error.localizedDescription)")
+            Log.write("saving markers to \(Log.path(storeURL)) failed: \(error.localizedDescription)")
             notice = String(localized: "The markers could not be saved: \(error.localizedDescription)")
         }
     }
