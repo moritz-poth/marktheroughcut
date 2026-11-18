@@ -71,7 +71,10 @@ enum Log {
     }
 
     /// A path in a log line, marked so reports hash all of it (`anonymize`), whatever characters the names contain.
-    static func path(_ url: URL) -> String { "‹\(url.path)›" }
+    static func path(_ url: URL) -> String {
+        // a name containing ‹ or › must not end the marking early
+        "‹" + url.path.replacingOccurrences(of: "‹", with: "_").replacingOccurrences(of: "›", with: "_") + "›"
+    }
 
     static func reveal() {
         if !FileManager.default.fileExists(atPath: file.path) { write("log opened"); flush() }

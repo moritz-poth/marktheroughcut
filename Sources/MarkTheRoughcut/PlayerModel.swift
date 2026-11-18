@@ -68,7 +68,7 @@ final class PlayerModel: ObservableObject {
             index = 0
             notice = info.hasTimecode ? nil : String(localized: "This file has no timecode. Markers start at 00:00:00:00 – they will only line up in Media Composer if the clip there starts at 00:00:00:00 too.")
             loadMarkers(for: url)
-            Log.write("open \(Log.path(url)): \(info.format.fps) fps, start \(info.format.string(info.startFrame))\(info.hasTimecode ? "" : " (no timecode)"), \(markers.count) markers from \(storeURL?.path ?? "-")")
+            Log.write("open \(Log.path(url)): \(info.format.fps) fps, start \(info.format.string(info.startFrame))\(info.hasTimecode ? "" : " (no timecode)"), \(markers.count) markers from \(storeURL.map(Log.path) ?? "-")")
             makeThumbnails(asset, info)
             waveform = nil
             Task { [weak self] in

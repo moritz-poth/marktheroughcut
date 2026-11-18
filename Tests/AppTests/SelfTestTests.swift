@@ -37,5 +37,8 @@ struct SelfTestTests {
         for word in ["Client", "Film", "Cut", "v3", "Secret", "‹", "›"] { #expect(!a.contains(word), "\(word) in \(a)") }
         #expect(a.hasPrefix("open ~/Movies/n"))
         #expect(a.contains(" failed: The file “n"))
+        let tricky = URL(fileURLWithPath: "\(home)/Movies/Client›Secret/<Name>.mov")
+        let b = anonymize("open \(Log.path(tricky)): 25 fps")
+        for word in ["Client", "Secret", "Name"] { #expect(!b.contains(word), "\(word) in \(b)") }
     }
 }

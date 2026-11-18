@@ -369,7 +369,7 @@ private let keepNames: Set<String> = ["Library", "Logs", "MarkTheRoughcut", "App
                                       "Macintosh HD", "Desktop", "Documents", "Downloads", "Movies", "tmp", "private", "var", "folders"]
 
 private func hashName(_ p: String) -> String {
-    if p.isEmpty || p == "~" || keepNames.contains(p) || p.hasPrefix("MarkTheRoughcut") || p.hasPrefix("<") { return p }
+    if p.isEmpty || p == "~" || keepNames.contains(p) || p.hasPrefix("MarkTheRoughcut") || p == "<user>" || p == "<computer>" { return p }
     return "n" + SHA256.hash(data: Data(p.utf8)).prefix(3).map { String(format: "%02x", $0) }.joined()
 }
 
